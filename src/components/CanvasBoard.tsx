@@ -188,7 +188,8 @@ export const CanvasBoard: React.FC<CanvasBoardProps> = ({ level, difficulty, onC
             setReplayProgress(prev => {
                 const next = prev + speed;
                 if (next >= totalPoints) {
-                    return totalPoints; // Keep it at max
+                    setIsReplaying(false); // Auto-exit replay mode when done
+                    return totalPoints;
                 }
                 replayFrameRef.current = requestAnimationFrame(animate);
                 return next;
