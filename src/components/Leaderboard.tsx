@@ -1,5 +1,5 @@
 import React from 'react';
-import { ArrowLeft, Trophy, Globe, User } from 'lucide-react';
+import { ArrowLeft, Globe, User } from 'lucide-react';
 
 interface LeaderboardProps {
     scores: Record<number, number>;
