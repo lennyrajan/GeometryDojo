@@ -87,7 +87,10 @@ export const fitToBox = (path: Point[], targetBox: { minX: number, maxX: number,
     // AND Scale user path such that its LONGEST SIDE length matches Target LONGEST SIDE length.
     // This preserves aspect ratio errors.
 
-    const scale = Math.max(targetBox.width, targetBox.height) / Math.max(box.width, box.height);
+    const denom = Math.max(box.width, box.height);
+    if (denom === 0) return path; // Avoid divide by zero
+
+    const scale = Math.max(targetBox.width, targetBox.height) / denom;
 
     const targetCenterX = targetBox.minX + targetBox.width / 2;
     const targetCenterY = targetBox.minY + targetBox.height / 2;
@@ -188,7 +191,7 @@ export const calculateScore = (
     const normalizedTarget = resampledTarget; // Target is already the reference
 
     // 3. Find Best Alignment (Cyclic Shift)
-    let bestScore = -Infinity;
+    let bestScore = 0;
     let bestAlignedUserPath: Point[] = [];
     let bestDiffs: number[] = [];
 

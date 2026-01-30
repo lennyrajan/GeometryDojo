@@ -469,9 +469,9 @@ const levels: Level[] = [
         description: "Cry me a river.",
         fact: "A hydrodynamic shape resembling a falling drop of water, which tapers at the top due to surface tension and air resistance.",
         shape: createParametric(
-            (t) => Math.cos(t),
             (t) => Math.sin(t) * Math.pow(Math.sin(t / 2), 0.5),
-            0.35, { x: 0.5, y: 0.3 }, 0, 4 * Math.PI
+            (t) => -Math.cos(t),
+            0.35, { x: 0.5, y: 0.6 }, 0, 4 * Math.PI
         ),
         unlockScore: 92.0
     },
