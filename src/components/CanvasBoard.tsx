@@ -20,6 +20,12 @@ export const CanvasBoard: React.FC<CanvasBoardProps> = ({ level, onComplete, onN
     // Dimensions for normalization
     const [dimensions, setDimensions] = useState({ w: 0, h: 0 });
 
+    // Zoom/Pan State
+    const [transform, setTransform] = useState({ k: 1, x: 0, y: 0 });
+    const [isZooming, setIsZooming] = useState(false);
+    const lastDist = useRef<number>(0);
+    const lastCenter = useRef<Point>({ x: 0, y: 0 });
+
     useEffect(() => {
         const handleResize = () => {
             if (canvasRef.current) {
@@ -42,7 +48,10 @@ export const CanvasBoard: React.FC<CanvasBoardProps> = ({ level, onComplete, onN
         setPoints([]);
         setResult(null);
         setIsDrawing(false);
+        setIsDrawing(false);
         setShowTarget(true);
+        setTransform({ k: 1, x: 0, y: 0 }); // Reset zoom
+        setIsZooming(false);
         draw();
     }, [level]);
 
@@ -56,6 +65,11 @@ export const CanvasBoard: React.FC<CanvasBoardProps> = ({ level, onComplete, onN
 
         const w = canvas.width;
         const h = canvas.height;
+
+        // Apply Transform
+        ctx.save();
+        ctx.translate(transform.x, transform.y);
+        ctx.scale(transform.k, transform.k);
 
         // Helper to map normalized point to canvas
         const toCanvas = (p: Point) => ({ x: p.x * w, y: p.y * h });
@@ -125,7 +139,7 @@ export const CanvasBoard: React.FC<CanvasBoardProps> = ({ level, onComplete, onN
 
     useEffect(() => {
         draw();
-    }, [points, result, dimensions]);
+    }, [points, result, dimensions, transform]);
 
     const getPoint = (e: React.MouseEvent | React.TouchEvent | PointerEvent): Point | null => {
         const canvas = canvasRef.current;
@@ -142,7 +156,16 @@ export const CanvasBoard: React.FC<CanvasBoardProps> = ({ level, onComplete, onN
     };
 
     const startDrawing = (e: React.PointerEvent) => {
-        if (result) return; // Locked results
+        if (result) {
+            // Zoom/Pan Logic
+            if (isZooming) {
+                e.currentTarget.setPointerCapture(e.pointerId);
+                // Initialize drag/pinch?
+                // Simple Panning:
+                lastCenter.current = { x: e.clientX, y: e.clientY };
+            }
+            return;
+        }
         e.currentTarget.setPointerCapture(e.pointerId);
         setIsDrawing(true);
         setPoints([]);
@@ -151,6 +174,14 @@ export const CanvasBoard: React.FC<CanvasBoardProps> = ({ level, onComplete, onN
     };
 
     const moveDrawing = (e: React.PointerEvent) => {
+        if (result && isZooming) {
+            const dx = e.clientX - lastCenter.current.x;
+            const dy = e.clientY - lastCenter.current.y;
+            setTransform(t => ({ ...t, x: t.x + dx, y: t.y + dy }));
+            lastCenter.current = { x: e.clientX, y: e.clientY };
+            return;
+        }
+
         if (!isDrawing) return;
         const p = getPoint(e);
         if (p) {
@@ -191,6 +222,18 @@ export const CanvasBoard: React.FC<CanvasBoardProps> = ({ level, onComplete, onN
         setPoints([]);
         setResult(null);
         setIsDrawing(false);
+        setIsZooming(false);
+        setTransform({ k: 1, x: 0, y: 0 });
+    };
+
+    const toggleZoom = () => {
+        if (!isZooming) {
+            setTransform({ k: 2, x: -dimensions.w / 2, y: -dimensions.h / 2 }); // Initial zoom in to center
+            setIsZooming(true);
+        } else {
+            setTransform({ k: 1, x: 0, y: 0 });
+            setIsZooming(false);
+        }
     };
 
     return (
@@ -210,7 +253,7 @@ export const CanvasBoard: React.FC<CanvasBoardProps> = ({ level, onComplete, onN
             </div>
 
             {/* Result Overlay */}
-            {result && (
+            {result && !isZooming && (
                 <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/60 backdrop-blur-sm pointer-events-none">
                     <div className="text-6xl font-black text-white mb-2" style={{ color: result.score >= 99.5 ? '#4ade80' : '#f87171' }}>
                         {result.score.toFixed(1)}%
@@ -220,6 +263,12 @@ export const CanvasBoard: React.FC<CanvasBoardProps> = ({ level, onComplete, onN
                     </div>
 
                     <div className="flex gap-4 pointer-events-auto">
+                        <button
+                            onClick={toggleZoom}
+                            className="p-4 rounded-full bg-white/10 hover:bg-white/20 transition-colors"
+                        >
+                            <ZoomIn className="w-6 h-6 text-white" />
+                        </button>
                         <button
                             onClick={reset}
                             className="p-4 rounded-full bg-white/10 hover:bg-white/20 transition-colors"
@@ -235,6 +284,30 @@ export const CanvasBoard: React.FC<CanvasBoardProps> = ({ level, onComplete, onN
                             </button>
                         )}
                     </div>
+                </div>
+            )}
+
+            {/* Zoom Controls Overlay */}
+            {isZooming && (
+                <div className="absolute bottom-8 right-8 flex gap-2 pointer-events-auto">
+                    <button
+                        onClick={() => setTransform(t => ({ ...t, k: t.k * 1.2 }))}
+                        className="p-3 bg-white/10 backdrop-blur rounded-full"
+                    >
+                        +
+                    </button>
+                    <button
+                        onClick={() => setTransform(t => ({ ...t, k: t.k / 1.2 }))}
+                        className="p-3 bg-white/10 backdrop-blur rounded-full"
+                    >
+                        -
+                    </button>
+                    <button
+                        onClick={toggleZoom}
+                        className="p-3 bg-red-500/80 backdrop-blur rounded-full text-sm font-bold"
+                    >
+                        X
+                    </button>
                 </div>
             )}
 
