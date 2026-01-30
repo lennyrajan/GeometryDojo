@@ -7,7 +7,7 @@ import { WelcomeScreen } from './components/WelcomeScreen';
 import { SettingsMenu } from './components/SettingsMenu';
 import { Level } from './lib/shapes';
 import levels from './lib/shapes';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, RefreshCcw } from 'lucide-react';
 
 function App() {
 
@@ -27,7 +27,10 @@ function App() {
 
     const [currentLevel, setCurrentLevel] = useState<Level | null>(null);
     const [viewingLeaderboard, setViewingLeaderboard] = useState(false);
+    const [currentLevel, setCurrentLevel] = useState<Level | null>(null);
+    const [viewingLeaderboard, setViewingLeaderboard] = useState(false);
     const [showingSettings, setShowingSettings] = useState(false);
+    const [resetKey, setResetKey] = useState(0);
 
     const handleLevelSelect = (level: Level) => {
         setCurrentLevel(level);
@@ -99,26 +102,39 @@ function App() {
                         className="pointer-events-auto p-2 bg-black/50 backdrop-blur rounded-full text-white hover:bg-white/10 transition-colors"
                     >
                         <ArrowLeft className="w-6 h-6" />
-                    </button>
+                        <button
+                            onClick={() => setCurrentLevel(null)}
+                            className="pointer-events-auto p-2 bg-black/50 backdrop-blur rounded-full text-white hover:bg-white/10 transition-colors"
+                        >
+                            <ArrowLeft className="w-6 h-6" />
+                        </button>
+                        <button
+                            onClick={() => setResetKey(k => k + 1)}
+                            className="pointer-events-auto p-2 bg-black/50 backdrop-blur rounded-full text-white hover:bg-white/10 transition-colors ml-2"
+                            title="Restart Level"
+                        >
+                            <RefreshCcw className="w-6 h-6" />
+                        </button>
 
-                    <div className="pointer-events-auto px-4 py-2 bg-black/30 backdrop-blur rounded-full">
-                        <span className="text-white font-bold text-sm tracking-widest uppercase opacity-80">
-                            {currentLevel.name}
-                        </span>
-                    </div>
+                        <div className="pointer-events-auto px-4 py-2 bg-black/30 backdrop-blur rounded-full">
+                            <span className="text-white font-bold text-sm tracking-widest uppercase opacity-80">
+                                {currentLevel.name}
+                            </span>
+                        </div>
 
-                    <div className="pointer-events-auto flex items-center gap-2 bg-black/50 backdrop-blur px-4 py-2 rounded-full border border-white/10">
-                        <span className="text-zinc-400 text-xs uppercase tracking-wider">Best:</span>
-                        <span className="text-white font-mono font-bold">
-                            {scores[currentLevel.id]?.toFixed(1) || "0.0"}%
-                        </span>
-                    </div>
+                        <div className="pointer-events-auto flex items-center gap-2 bg-black/50 backdrop-blur px-4 py-2 rounded-full border border-white/10">
+                            <span className="text-zinc-400 text-xs uppercase tracking-wider">Best:</span>
+                            <span className="text-white font-mono font-bold">
+                                {scores[currentLevel.id]?.toFixed(1) || "0.0"}%
+                            </span>
+                        </div>
                 </div>
             )}
 
             {/* Game Board */}
             {currentLevel ? (
                 <CanvasBoard
+                    key={`${currentLevel.id}-${resetKey}`}
                     level={currentLevel}
                     difficulty={difficulty}
                     bestScore={scores[currentLevel.id]}
