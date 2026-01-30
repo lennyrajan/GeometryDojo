@@ -283,12 +283,7 @@ export const CanvasBoard: React.FC<CanvasBoardProps> = ({ level, difficulty, onC
                         >
                             <Play className="w-6 h-6 text-white" />
                         </button>
-                        <button
-                            onClick={reset}
-                            className="p-4 rounded-full bg-white/10 hover:bg-white/20 transition-colors"
-                        >
-                            <RefreshCcw className="w-6 h-6 text-white" />
-                        </button>
+
                         {result.score >= level.unlockScore && onNext && (
                             <button
                                 onClick={onNext}
@@ -315,18 +310,7 @@ export const CanvasBoard: React.FC<CanvasBoardProps> = ({ level, difficulty, onC
 
             {/* Controls */}
             <div className="flex justify-between items-center px-6 pb-8">
-                <button
-                    onClick={() => {
-                        setPoints([]);
-                        setResult(null);
-                        setIsDrawing(false);
-                        stopReplay();
-                        draw();
-                    }}
-                    className={`p-4 rounded-full transition-all active:scale-95 ${theme === 'space' ? 'bg-white/10 hover:bg-white/20 text-white' : 'bg-zinc-900 border border-zinc-800 text-zinc-400 hover:text-white'}`}
-                >
-                    <RefreshCcw className="w-6 h-6" />
-                </button>
+
 
                 {result && !isDrawing && (
                     <div className="flex gap-4 animate-in slide-in-from-bottom-4 fade-in duration-300">
