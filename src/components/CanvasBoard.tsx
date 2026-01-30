@@ -54,26 +54,6 @@ export const CanvasBoard: React.FC<CanvasBoardProps> = ({ level, difficulty, onC
         draw();
     }, [level]);
 
-    // Randomize Success Color (avoiding Red 0/360 and Orange 30)
-    // Range: 60 (Yellow) to 320 (Pink)
-    const [successHue, setSuccessHue] = useState(120);
-
-    // ... (previous useEffects)
-
-    useEffect(() => {
-        // Reset when level changes
-        setPoints([]);
-        setResult(null);
-        setIsDrawing(false);
-        setShowTarget(true);
-        stopReplay();
-        // Pick new random neon color (weighted towards cool colors)
-        // 120(green), 180(cyan), 200(sky), 260(purple), 300(magenta), 50(gold)
-        const hues = [120, 160, 180, 200, 220, 260, 280, 300, 320, 50];
-        setSuccessHue(hues[Math.floor(Math.random() * hues.length)]);
-        draw();
-    }, [level]);
-
     const draw = () => {
         const canvas = canvasRef.current;
         if (!canvas) return;
@@ -88,7 +68,10 @@ export const CanvasBoard: React.FC<CanvasBoardProps> = ({ level, difficulty, onC
         const offsetX = (w - size) / 2;
         const offsetY = (h - size) / 2;
 
+        // Apply Transform - REMOVED for Replay Mode (keep static)
         ctx.save();
+        // ctx.translate(transform.x, transform.y);
+        // ctx.scale(transform.k, transform.k);
 
         // Helper to map normalized point to canvas (Aspect Correct)
         const toCanvas = (p: Point) => ({
@@ -96,7 +79,7 @@ export const CanvasBoard: React.FC<CanvasBoardProps> = ({ level, difficulty, onC
             y: p.y * size + offsetY
         });
 
-        // Draw Target Shape (Faint Guide) - WHITE keeps white
+        // Draw Target Shape (Faint Guide)
         if (showTarget || result) {
             const targetPoints = level.shape.map(toCanvas);
             ctx.beginPath();
@@ -114,7 +97,7 @@ export const CanvasBoard: React.FC<CanvasBoardProps> = ({ level, difficulty, onC
             ctx.stroke();
         }
 
-        // Draw User Path - WHITE keeps white
+        // Draw User Path
         if (points.length > 0 && !result) {
             ctx.beginPath();
             ctx.strokeStyle = 'white';
@@ -129,7 +112,7 @@ export const CanvasBoard: React.FC<CanvasBoardProps> = ({ level, difficulty, onC
             ctx.stroke();
         }
 
-        // Draw Result (Heatmap) - RANDOM COLORS
+        // Draw Result (Heatmap)
         if (result) {
             const { alignedUserPath, diffs } = result;
             const alignedCanvas = alignedUserPath.map(toCanvas);
@@ -142,11 +125,7 @@ export const CanvasBoard: React.FC<CanvasBoardProps> = ({ level, difficulty, onC
                 ctx.beginPath();
                 const diff = diffs[i];
                 const goodness = Math.max(0, 1 - (diff * 20));
-
-                // Interpolate from Red (0) to Random Success Hue
-                // Note: We use linear interpolation for hue. 
-                // Since 0 is Red, multiplying goodness * successHue smoothly transitions from Red to Target Color.
-                const hue = goodness * successHue;
+                const hue = goodness * 120;
 
                 ctx.strokeStyle = `hsl(${hue}, 100%, 50%)`;
                 ctx.lineWidth = 4;
@@ -291,7 +270,7 @@ export const CanvasBoard: React.FC<CanvasBoardProps> = ({ level, difficulty, onC
             {/* Result Overlay */}
             {result && !isReplaying && (
                 <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/60 backdrop-blur-sm pointer-events-none">
-                    <div className="text-6xl font-black text-white mb-2" style={{ color: result.score >= 92.0 ? `hsl(${successHue}, 100%, 60%)` : '#f87171' }}>
+                    <div className="text-6xl font-black text-white mb-2" style={{ color: result.score >= 92.0 ? '#4ade80' : '#f87171' }}>
                         {result.score.toFixed(1)}%
                     </div>
                     <div className="text-white/70 mb-8 font-mono tracking-widest uppercase">
@@ -314,8 +293,7 @@ export const CanvasBoard: React.FC<CanvasBoardProps> = ({ level, difficulty, onC
                         {result.score >= level.unlockScore && onNext && (
                             <button
                                 onClick={onNext}
-                                className="p-4 rounded-full transition-colors shadow-lg shadow-white/10"
-                                style={{ backgroundColor: `hsl(${successHue}, 100%, 40%)` }}
+                                className="p-4 rounded-full bg-green-500 hover:bg-green-600 transition-colors"
                             >
                                 <Check className="w-6 h-6 text-white" />
                             </button>
