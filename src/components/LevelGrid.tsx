@@ -1,8 +1,7 @@
 import React from 'react';
 import { Level } from '../lib/shapes';
-import { Lock, Trophy, Settings } from 'lucide-react';
+import { Trophy, Settings } from 'lucide-react';
 import levels from '../lib/shapes';
-import { Difficulty } from '../types';
 
 interface LevelGridProps {
     unlockedLevels: number[];
