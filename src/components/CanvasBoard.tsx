@@ -201,6 +201,11 @@ export const CanvasBoard: React.FC<CanvasBoardProps> = ({ level, difficulty, onC
         }
     };
 
+    // Dynamic Feedback Messages
+    const successMessages = ["Flawless!", "Geometry God!", "Perfect Form!", "Algorithm Approved!", "Pixel Perfect!", "Sublime!", "Exceptional!"];
+    const failureMessages = ["Adjust Your Angle", "Focus Breathing", "Steady Hand Needed", "Alignment Error", "Recalibrate...", "Close, But No", "Try Again"];
+    const [feedbackMessage, setFeedbackMessage] = useState("");
+
     const endDrawing = () => {
         if (!isDrawing) return;
         setIsDrawing(false);
@@ -226,12 +231,13 @@ export const CanvasBoard: React.FC<CanvasBoardProps> = ({ level, difficulty, onC
         setResult(res);
         onComplete(res.score);
 
-        if (navigator.vibrate) {
-            if (res.score >= 92.0) {
-                navigator.vibrate([100, 50, 100]);
-            } else {
-                navigator.vibrate(200);
-            }
+        // Select random feedback message
+        if (res.score >= 92.0) {
+            setFeedbackMessage(successMessages[Math.floor(Math.random() * successMessages.length)]);
+            if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
+        } else {
+            setFeedbackMessage(failureMessages[Math.floor(Math.random() * failureMessages.length)]);
+            if (navigator.vibrate) navigator.vibrate(200);
         }
     };
 
@@ -275,8 +281,8 @@ export const CanvasBoard: React.FC<CanvasBoardProps> = ({ level, difficulty, onC
                     <div className="text-6xl font-black text-white mb-2" style={{ color: result.score >= 92.0 ? '#4ade80' : '#f87171' }}>
                         {result.score.toFixed(1)}%
                     </div>
-                    <div className="text-white/70 mb-8 font-mono">
-                        {result.score >= 92.0 ? "PASSED" : "TRY AGAIN"}
+                    <div className="text-white/70 mb-8 font-mono tracking-widest uppercase">
+                        {feedbackMessage}
                     </div>
 
                     <div className="flex gap-4 pointer-events-auto">
