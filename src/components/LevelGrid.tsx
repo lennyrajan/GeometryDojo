@@ -2,19 +2,19 @@ import React from 'react';
 import { Level } from '../lib/shapes';
 import { Lock, Trophy, Settings } from 'lucide-react';
 import levels from '../lib/shapes';
+import { Difficulty } from '../types';
 
 interface LevelGridProps {
     unlockedLevels: number[];
     scores: Record<number, number>;
     onSelectLevel: (level: Level) => void;
-    onReset: () => void;
     onViewLeaderboard: () => void;
     onOpenSettings: () => void;
-    activeDifficulty: Difficulty; // For title color
+    activeDifficulty: Difficulty;
     theme: 'space' | 'classic';
 }
 
-export const LevelGrid: React.FC<LevelGridProps> = ({ unlockedLevels, scores, onSelectLevel, onReset, onViewLeaderboard, onOpenSettings, activeDifficulty, theme }) => {
+export const LevelGrid: React.FC<LevelGridProps> = ({ unlockedLevels, scores, onSelectLevel, onViewLeaderboard, onOpenSettings, activeDifficulty, theme }) => {
     return (
         <div className="p-4 h-full flex flex-col">
             <div className="flex justify-between items-start mb-4">

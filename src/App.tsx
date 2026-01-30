@@ -164,11 +164,10 @@ function App() {
                 />
             ) : (
                 <LevelGrid
-                    levels={levels}
                     unlockedLevels={unlockedLevels}
-                    scores={scores[difficulty]}
-                    onLevelSelect={handleLevelSelect}
-                    onOpenLeaderboard={() => setViewingLeaderboard(true)}
+                    scores={scores}
+                    onSelectLevel={handleLevelSelect}
+                    onViewLeaderboard={() => setViewingLeaderboard(true)}
                     onOpenSettings={() => setShowingSettings(true)}
                     activeDifficulty={difficulty}
                     theme={theme}
