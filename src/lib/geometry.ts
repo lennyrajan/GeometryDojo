@@ -194,25 +194,28 @@ export const calculateScore = (userPath: Point[], targetPath: Point[]): { score:
         const uIdxNext = (i + 5) % count;
         const userAngle = getAngle(bestUserPath[uIdxPrev], bestUserPath[uIdxCurr], bestUserPath[uIdxNext]);
 
-        angleDiffs.push(Math.abs(userAngle - targetAngle));
+        // Calculate diff
+        let diff = Math.abs(userAngle - targetAngle);
+
+        // IGNORE small deviations (Tolerance Buffer)
+        // This allows for "rounded corners" or hand wobbles (up to 20 degrees)
+        // but still catches the massive error of Circle (170ish) vs Square (90) which is ~80 deg diff.
+        diff = Math.max(0, diff - 20);
+
+        angleDiffs.push(diff);
     }
 
     // Max Angle Deviation is the best indicator of "Missing a Corner"
-    // For Circle vs Octagon, this spikes to ~40 degrees at vertices.
-    // For Wobbly User vs Octagon, this spikes to ~10 degrees due to noise.
     const maxAngleDiff = Math.max(...angleDiffs);
     const avgAngleDiff = angleDiffs.reduce((a, b) => a + b, 0) / count;
 
     // Scoring Formula
     // AvgDist * 300: Base spatial match
     // MaxDist * 50: Max spatial deviation
-    // MaxAngleDiff * 1.0: Max shape mismatch (missing a corner) - Reduced from 2.0
-    // AvgAngleDiff * 0.5: General shape mismatch - Reduced from 3.0
+    // MaxAngleDiff * 1.5: Max shape mismatch (missing a corner) - Increased slightly since we have a buffer now
+    // AvgAngleDiff * 0.5: General shape mismatch
 
-    // "Cut some slack": Allow wobbly hands (10-15 deg error) to still get > 92%.
-    // Circle error (40 deg) will still be -40 points -> Fail.
-
-    const totalPenalty = (avgDist * 300) + (maxDist * 50) + (maxAngleDiff * 1.0) + (avgAngleDiff * 0.5);
+    const totalPenalty = (avgDist * 300) + (maxDist * 50) + (maxAngleDiff * 1.5) + (avgAngleDiff * 0.5);
     const score = Math.max(0, 100 - totalPenalty);
 
     return { score, diffs, alignedUserPath: bestUserPath };
