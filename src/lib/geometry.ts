@@ -163,13 +163,17 @@ export const calculateScore = (userPath: Point[], targetPath: Point[]): { score:
 
     const avgDist = minTotalDist / count;
 
+    // Penalize systematic errors (like max deviation).
+    // If user draws a circle over a hexagon, the MAX pairwise distance will be high at the vertices.
+    const maxDist = Math.max(...diffs);
+
     // Scoring formula:
-    // With better alignment, the distances should be much smaller for good shapes.
-    // Previous: 100 - (avgDist * 200). 
-    // If avgDist is 0.01 (1%), score was 98.
-    // Now that alignment is fixed, 0.01 should still be a high score.
-    // Let's keep the multiplier rigid to reward precision.
-    const score = Math.max(0, 100 - (avgDist * 300));
+    // Base penalty: Average Distance * Weight
+    // Plus: Max Distance * Weight
+    // Prioritize uniformity.
+
+    const penalty = (avgDist * 300) + (maxDist * 100);
+    const score = Math.max(0, 100 - penalty);
 
     return { score, diffs, alignedUserPath: bestUserPath };
 };
