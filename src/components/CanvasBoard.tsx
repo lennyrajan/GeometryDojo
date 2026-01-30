@@ -289,28 +289,37 @@ export const CanvasBoard: React.FC<CanvasBoardProps> = ({ level, difficulty, onC
                         {feedbackMessage}
                     </div>
 
-                    <div className="flex gap-4 pointer-events-auto">
-                        <button
-                            onClick={startReplay}
-                            className="p-4 rounded-full bg-white/10 hover:bg-white/20 transition-colors"
-                        >
-                            <Play className="w-6 h-6 text-white" />
-                        </button>
+                    <div className="flex gap-6 pointer-events-auto items-start">
+                        <div className="flex flex-col items-center gap-2">
+                            <button
+                                onClick={startReplay}
+                                className="p-4 rounded-full bg-white/10 hover:bg-white/20 transition-colors"
+                            >
+                                <Play className="w-6 h-6 text-white" />
+                            </button>
+                            <span className="text-[10px] font-bold tracking-widest text-white/50 uppercase">Watch Replay</span>
+                        </div>
 
-                        <button
-                            onClick={reset}
-                            className="p-4 rounded-full bg-white/10 hover:bg-white/20 transition-colors"
-                        >
-                            <RefreshCcw className="w-6 h-6 text-white" />
-                        </button>
+                        <div className="flex flex-col items-center gap-2">
+                            <button
+                                onClick={reset}
+                                className="p-4 rounded-full bg-white/10 hover:bg-white/20 transition-colors"
+                            >
+                                <RefreshCcw className="w-6 h-6 text-white" />
+                            </button>
+                            <span className="text-[10px] font-bold tracking-widest text-white/50 uppercase">Try Again</span>
+                        </div>
 
                         {result.score >= level.unlockScore && onNext && (
-                            <button
-                                onClick={onNext}
-                                className="p-4 rounded-full bg-green-500 hover:bg-green-600 transition-colors"
-                            >
-                                <Check className="w-6 h-6 text-white" />
-                            </button>
+                            <div className="flex flex-col items-center gap-2">
+                                <button
+                                    onClick={onNext}
+                                    className="p-4 rounded-full bg-green-500 hover:bg-green-600 transition-colors shadow-lg shadow-green-500/30"
+                                >
+                                    <Check className="w-6 h-6 text-white" />
+                                </button>
+                                <span className="text-[10px] font-bold tracking-widest text-green-400/80 uppercase">Next Level</span>
+                            </div>
                         )}
                     </div>
                 </div>
