@@ -94,5 +94,4 @@ export const LevelGrid: React.FC<LevelGridProps> = ({ unlockedLevels, scores, on
         </div>
     );
 };
-    );
-};
+
