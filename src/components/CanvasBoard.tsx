@@ -2,7 +2,7 @@ import React, { useRef, useEffect, useState } from 'react';
 import { Level } from '../lib/shapes';
 import { calculateScore, Point } from '../lib/geometry';
 import { Difficulty } from '../types';
-import { RefreshCcw, Check, Play, X } from 'lucide-react';
+import { Check, Play, X } from 'lucide-react';
 
 interface CanvasBoardProps {
     level: Level;
@@ -243,12 +243,7 @@ export const CanvasBoard: React.FC<CanvasBoardProps> = ({ level, difficulty, onC
         }
     };
 
-    const reset = () => {
-        stopReplay();
-        setPoints([]);
-        setResult(null);
-        setIsDrawing(false);
-    };
+
 
 
 
