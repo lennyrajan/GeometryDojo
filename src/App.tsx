@@ -141,7 +141,13 @@ function App() {
                         </div>
                     </div>
 
-                    <div className="pointer-events-auto">
+                    <div className="pointer-events-auto flex gap-2">
+                        <button
+                            onClick={() => setShowFact(true)}
+                            className="p-2 bg-black/40 backdrop-blur rounded-full text-white hover:bg-white/10 transition-colors border border-white/5"
+                        >
+                            <Info className="w-5 h-5" />
+                        </button>
                         <button
                             onClick={() => setResetKey(k => k + 1)}
                             className="p-2 bg-black/40 backdrop-blur rounded-full text-white hover:bg-white/10 transition-colors border border-white/5"
@@ -149,6 +155,39 @@ function App() {
                         >
                             <RefreshCcw className="w-5 h-5" />
                         </button>
+                    </div>
+                </div>
+            )}
+
+            {/* Fact Modal */}
+            {showFact && currentLevel && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
+                    <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6 max-w-sm w-full shadow-2xl relative animate-in zoom-in-95 duration-200">
+                        <button
+                            onClick={() => setShowFact(false)}
+                            className="absolute top-4 right-4 text-zinc-400 hover:text-white"
+                        >
+                            <X className="w-5 h-5" />
+                        </button>
+
+                        <div className="flex flex-col items-center text-center gap-4">
+                            <div className="w-12 h-12 rounded-full bg-indigo-500/20 flex items-center justify-center text-indigo-400 mb-2">
+                                <Info className="w-6 h-6" />
+                            </div>
+
+                            <h2 className="text-xl font-bold text-white">{currentLevel.name}</h2>
+
+                            <p className="text-zinc-300 leading-relaxed text-sm">
+                                {currentLevel.fact}
+                            </p>
+
+                            <button
+                                onClick={() => setShowFact(false)}
+                                className="mt-2 w-full py-3 bg-white text-black font-bold rounded-xl hover:bg-zinc-200 transition-colors"
+                            >
+                                Got it
+                            </button>
+                        </div>
                     </div>
                 </div>
             )}
