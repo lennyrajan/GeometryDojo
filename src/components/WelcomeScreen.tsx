@@ -47,7 +47,7 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onComplete }) => {
                             GEOMETRY <span className="text-indigo-400">DOJO</span>
                         </h1>
                         <p className="text-indigo-200/60 font-mono text-xs tracking-[0.2em] uppercase">
-                            Precision Training Module
+                            The Way of the Perfect Shape
                         </p>
                     </div>
                 </div>
