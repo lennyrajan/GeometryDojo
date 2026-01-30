@@ -2,7 +2,7 @@ import React, { useRef, useEffect, useState } from 'react';
 import { Level } from '../lib/shapes';
 import { calculateScore, Point } from '../lib/geometry';
 import { Difficulty } from '../types';
-import { Check, Play, X } from 'lucide-react';
+import { Check, Play, X, Loader2 } from 'lucide-react';
 
 interface CanvasBoardProps {
     level: Level;
@@ -321,7 +321,7 @@ export const CanvasBoard: React.FC<CanvasBoardProps> = ({ level, difficulty, onC
                         >
                             {isReplaying ? (
                                 <>
-                                    <RefreshCcw className="w-4 h-4 animate-spin" />
+                                    <Loader2 className="w-4 h-4 animate-spin" />
                                     Replaying
                                 </>
                             ) : (
