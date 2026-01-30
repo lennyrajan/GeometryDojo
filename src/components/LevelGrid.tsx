@@ -2,6 +2,7 @@ import React from 'react';
 import { Level } from '../lib/shapes';
 import { Trophy, Settings, Lock } from 'lucide-react';
 import levels from '../lib/shapes';
+import { Difficulty } from '../types';
 
 interface LevelGridProps {
     unlockedLevels: number[];
@@ -9,15 +10,24 @@ interface LevelGridProps {
     onSelectLevel: (level: Level) => void;
     onViewLeaderboard: () => void;
     onOpenSettings: () => void;
+    activeDifficulty: Difficulty;
     theme: 'space' | 'classic';
 }
 
-export const LevelGrid: React.FC<LevelGridProps> = ({ unlockedLevels, scores, onSelectLevel, onViewLeaderboard, onOpenSettings, theme }) => {
+export const LevelGrid: React.FC<LevelGridProps> = ({ unlockedLevels, scores, onSelectLevel, onViewLeaderboard, onOpenSettings, activeDifficulty, theme }) => {
     return (
         <div className="p-4 h-full flex flex-col">
             <div className="flex justify-between items-start mb-4">
                 <div>
-                    <h1 className="text-xl font-bold text-white mb-1">Geometry Dojo</h1>
+                    <h1 className="text-xl font-bold text-white mb-1 flex items-center gap-2">
+                        Geometry Dojo
+                        <span className={`text-[10px] uppercase font-bold px-2 py-0.5 rounded border border-white/10 ${activeDifficulty === 'easy' ? 'bg-green-500/20 text-green-400' :
+                            activeDifficulty === 'medium' ? 'bg-yellow-500/20 text-yellow-400' :
+                                'bg-red-500/20 text-red-400'
+                            }`}>
+                            {activeDifficulty}
+                        </span>
+                    </h1>
                     <p className="text-zinc-400 text-xs max-w-[200px] leading-tight">
                         Trace perfectly. <br />
                         <span className="text-green-500 font-bold">92%</span> accuracy required.
