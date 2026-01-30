@@ -71,7 +71,7 @@ function App() {
     }
 
     return (
-        <div className={`w-full h-screen bg-zinc-950 overflow-hidden flex flex-col transition-colors duration-500 theme-${theme}`}>
+        <div className={`w-full h-screen bg-background text-foreground overflow-hidden flex flex-col transition-colors duration-500 theme-${theme}`}>
             {/* Settings Modal */}
             {showingSettings && (
                 <SettingsMenu
