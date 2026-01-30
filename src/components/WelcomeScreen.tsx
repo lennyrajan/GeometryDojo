@@ -6,7 +6,7 @@ interface WelcomeScreenProps {
     onComplete: (name: string, difficulty: Difficulty) => void;
 }
 
-export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onComplete }) => {
+export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onComplete }: WelcomeScreenProps) => {
     const [name, setName] = useState('');
     const [difficulty, setDifficulty] = useState<Difficulty>('medium');
     const [error, setError] = useState('');
@@ -66,7 +66,7 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onComplete }) => {
                     </div>
 
                     <div className="text-center space-y-2">
-                        <h1 className="text-4xl font-black text-white tracking-tight drop-shadow-lg">
+                        <h1 className="text-5xl font-black text-white tracking-tighter drop-shadow-xl uppercase">
                             GEOMETRY <span className="text-indigo-400">DOJO</span>
                         </h1>
                         <p className="text-indigo-200/60 font-mono text-xs tracking-[0.2em] uppercase">
@@ -122,9 +122,9 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onComplete }) => {
                                 ))}
                             </div>
                             <p className="text-[10px] text-center font-mono text-indigo-300/40">
-                                {difficulty === 'easy' && "TOLERANCE: 30° // STATUS: FORGIVING"}
-                                {difficulty === 'medium' && "TOLERANCE: 15° // STATUS: BALANCED"}
-                                {difficulty === 'hard' && "TOLERANCE: 8° // STATUS: PRECISE"}
+                                {difficulty === 'easy' && "TOLERANCE: 45° // STATUS: GENEROUS"}
+                                {difficulty === 'medium' && "TOLERANCE: 30° // STATUS: FAIR"}
+                                {difficulty === 'hard' && "TOLERANCE: 15° // STATUS: PRECISE"}
                             </p>
                         </div>
 

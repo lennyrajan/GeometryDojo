@@ -15,7 +15,16 @@ interface LevelGridProps {
     playerName: string;
 }
 
-export const LevelGrid: React.FC<LevelGridProps> = ({ unlockedLevels, scores, onSelectLevel, onViewLeaderboard, onOpenSettings, activeDifficulty, theme, playerName }) => {
+export const LevelGrid: React.FC<LevelGridProps> = ({
+    unlockedLevels,
+    scores,
+    onSelectLevel,
+    onViewLeaderboard,
+    onOpenSettings,
+    activeDifficulty,
+    theme,
+    playerName
+}: LevelGridProps) => {
     const greeting = React.useMemo(() => {
         const hour = new Date().getHours();
         if (hour < 12) return 'Good Morning';
@@ -23,8 +32,8 @@ export const LevelGrid: React.FC<LevelGridProps> = ({ unlockedLevels, scores, on
         return 'Good Evening';
     }, []);
 
-    const subtitle = React.useMemo(() => {
-        const quotes = [
+    const DynamicSubtitle = () => {
+        const quotes = React.useMemo(() => [
             "Trace perfectly.",
             "Steady hand, focused mind.",
             "Precision is key.",
@@ -32,49 +41,81 @@ export const LevelGrid: React.FC<LevelGridProps> = ({ unlockedLevels, scores, on
             "The shape awaits.",
             "Master the geometry.",
             "Flow like water.",
-            "Perfection is a journey."
-        ];
-        return quotes[Math.floor(Math.random() * quotes.length)];
-    }, []);
+            "Perfection is a journey.",
+            "Mind like a mirror.",
+            "Focus determines reality.",
+            "Strength through geometry.",
+            "Breath in, draw out.",
+            "The master was once a student.",
+            "Simplicity is the ultimate sophistication.",
+            "One line at a time.",
+            "Find your center.",
+            "Harmony in symmetry.",
+            "Precision is silence.",
+            "Quiet the noise, see the shape.",
+            "A steady hand starts with a steady heart."
+        ], []);
+
+        const [index, setIndex] = React.useState(0);
+        const [key, setKey] = React.useState(0);
+
+        React.useEffect(() => {
+            const interval = setInterval(() => {
+                setIndex((prev: number) => (prev + 1) % quotes.length);
+                setKey((prev: number) => prev + 1);
+            }, 4000); // Matches CSS animation duration
+            return () => clearInterval(interval);
+        }, [quotes.length]);
+
+        return (
+            <p key={key} className="text-zinc-400 text-[10px] sm:text-xs max-w-[200px] leading-tight font-medium animate-fade-in-out">
+                {quotes[index]}
+            </p>
+        );
+    };
 
     return (
         <div className="p-4 h-full flex flex-col">
-            <div className="flex justify-between items-start mb-4">
+            <div className="flex justify-between items-center mb-6">
                 <div className="flex flex-col">
-                    <h1 className="text-xl font-bold text-white mb-1 flex items-center gap-2">
+                    <h1 className="text-3xl font-black text-white tracking-tighter flex items-center gap-3">
                         Geometry Dojo
-                        <span className={`text-[8px] uppercase font-bold px-1.5 py-[1px] leading-none rounded border border-white/10 ${activeDifficulty === 'easy' ? 'bg-green-500/20 text-green-400' :
-                            activeDifficulty === 'medium' ? 'bg-yellow-500/20 text-yellow-400' :
-                                'bg-red-500/20 text-red-400'
+                        <span className={`text-[10px] uppercase font-black px-2 py-0.5 leading-none rounded-md border border-white/5 ${activeDifficulty === 'easy' ? 'bg-green-500/10 text-green-400' :
+                            activeDifficulty === 'medium' ? 'bg-yellow-500/10 text-yellow-400' :
+                                'bg-red-500/10 text-red-400'
                             }`}>
                             {activeDifficulty}
                         </span>
                     </h1>
-                    <div className="flex items-center gap-2 mb-1">
-                        <div className="w-1.5 h-1.5 rounded-full bg-indigo-500 animate-pulse" />
-                        <span className="text-xs font-bold text-indigo-300 uppercase tracking-wider">
-                            {greeting}, {playerName}
+                    <DynamicSubtitle />
+                </div>
+
+                <div className="flex items-center gap-4">
+                    <div className="hidden sm:flex flex-col items-end">
+                        <span className="text-[10px] font-black text-indigo-400 uppercase tracking-[0.2em] opacity-70">
+                            {greeting}
+                        </span>
+                        <span className="text-sm font-bold text-white tracking-tight">
+                            {playerName}
                         </span>
                     </div>
-                    <p className="text-zinc-400 text-xs max-w-[200px] leading-tight opacity-50">
-                        {subtitle}
-                    </p>
-                </div>
-                <div className="flex gap-2">
-                    <button
-                        onClick={onViewLeaderboard}
-                        className={`p-2 rounded-full transition-colors border ${theme === 'space' ? 'bg-white/10 border-white/10 hover:bg-white/20' : 'bg-zinc-900 border-zinc-800 hover:bg-zinc-800'}`}
-                        title="Leaderboard"
-                    >
-                        <Trophy className="w-4 h-4 text-yellow-500" />
-                    </button>
-                    <button
-                        onClick={onOpenSettings}
-                        className={`p-2 rounded-full transition-colors border ${theme === 'space' ? 'bg-white/10 border-white/10 hover:bg-white/20' : 'bg-zinc-900 border-zinc-800 hover:bg-zinc-800'}`}
-                        title="Settings"
-                    >
-                        <Settings className={`w-4 h-4 ${theme === 'space' ? 'text-indigo-200' : 'text-zinc-400'}`} />
-                    </button>
+
+                    <div className="flex gap-2">
+                        <button
+                            onClick={onViewLeaderboard}
+                            className={`p-2.5 rounded-xl transition-all border ${theme === 'space' ? 'bg-white/5 border-white/5 hover:bg-white/10 hover:border-white/20' : 'bg-zinc-900 border-zinc-800 hover:border-zinc-700'} shadow-lg`}
+                            title="Leaderboard"
+                        >
+                            <Trophy className="w-4 h-4 text-yellow-500" />
+                        </button>
+                        <button
+                            onClick={onOpenSettings}
+                            className={`p-2.5 rounded-xl transition-all border ${theme === 'space' ? 'bg-white/5 border-white/5 hover:bg-white/10 hover:border-white/20' : 'bg-zinc-900 border-zinc-800 hover:border-zinc-700'} shadow-lg`}
+                            title="Settings"
+                        >
+                            <Settings className={`w-4 h-4 ${theme === 'space' ? 'text-indigo-200' : 'text-zinc-400'}`} />
+                        </button>
+                    </div>
                 </div>
             </div>
 
