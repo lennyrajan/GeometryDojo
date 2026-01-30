@@ -121,7 +121,8 @@ const scoreAlignment = (
     targetPath: Point[],
     angleTolerance: number,
     maxAngleWeight: number,
-    avgAngleWeight: number
+    avgAngleWeight: number,
+    spatialPenaltyMultiplier: number = 1.0
 ) => {
     const count = userPath.length;
     let totalDist = 0;
@@ -163,7 +164,8 @@ const scoreAlignment = (
 
     // Scoring Formula
     const avgDist = totalDist / count;
-    const totalPenalty = (avgDist * 300) + (maxDist * 50) + (maxAngleDiff * maxAngleWeight) + (avgAngleDiff * avgAngleWeight);
+    // Apply spatial multiplier to distance penalties
+    const totalPenalty = ((avgDist * 300) + (maxDist * 50)) * spatialPenaltyMultiplier + (maxAngleDiff * maxAngleWeight) + (avgAngleDiff * avgAngleWeight);
     const score = Math.max(0, 100 - totalPenalty);
 
     return { score, diffs };
@@ -194,22 +196,26 @@ export const calculateScore = (
     let angleTolerance = 30;
     let maxAngleWeight = 1.0;
     let avgAngleWeight = 0.2;
+    let spatialPenaltyMultiplier = 1.0;
 
     switch (difficulty) {
         case 'easy':
             angleTolerance = 45; // Very forgiving
             maxAngleWeight = 0.8;
             avgAngleWeight = 0.1;
+            spatialPenaltyMultiplier = 0.8;
             break;
         case 'medium':
             angleTolerance = 30; // Standard
             maxAngleWeight = 1.0;
             avgAngleWeight = 0.2;
+            spatialPenaltyMultiplier = 1.0;
             break;
         case 'hard':
-            angleTolerance = 15; // Strict
-            maxAngleWeight = 1.5;
-            avgAngleWeight = 0.3;
+            angleTolerance = 10; // Very Strict
+            maxAngleWeight = 2.0;
+            avgAngleWeight = 0.5;
+            spatialPenaltyMultiplier = 3.0; // Heavily penalize any spatial deviation (e.g. curves on straight lines)
             break;
     }
 
@@ -221,7 +227,21 @@ export const calculateScore = (
     for (const path of userPathsToTest) {
         for (let shift = 0; shift < SAMPLING_POINTS; shift++) {
             const shiftedUser = [...path.slice(shift), ...path.slice(0, shift)];
-            const { score, diffs } = scoreAlignment(shiftedUser, normalizedTarget, angleTolerance, maxAngleWeight, avgAngleWeight);
+            // Pass spatialMultiplier to scoreAlignment or calculate it here?
+            // scoreAlignment doesn't take the multiplier currently.
+            // Let's modify scoreAlignment or just apply it to the result?
+            // scoreAlignment returns { score, diffs }. But score is already clamped 0-100.
+            // We need to inject the multiplier into the penalty calculation inside scoreAlignment.
+            // Adjusting function signature...
+
+            const { score, diffs } = scoreAlignment(
+                shiftedUser,
+                normalizedTarget,
+                angleTolerance,
+                maxAngleWeight,
+                avgAngleWeight,
+                spatialPenaltyMultiplier
+            );
 
             if (score > bestScore) {
                 bestScore = score;
