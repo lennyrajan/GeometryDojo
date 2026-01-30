@@ -2,7 +2,7 @@ import React, { useRef, useEffect, useState } from 'react';
 import { Level } from '../lib/shapes';
 import { calculateScore, Point } from '../lib/geometry';
 import { Difficulty } from '../types';
-import { RefreshCcw, Check, Play, Square, X } from 'lucide-react';
+import { RefreshCcw, Check, Play, X } from 'lucide-react';
 
 interface CanvasBoardProps {
     level: Level;
@@ -268,7 +268,7 @@ export const CanvasBoard: React.FC<CanvasBoardProps> = ({ level, difficulty, onC
             </div>
 
             {/* Result Overlay */}
-            {result && !isZooming && (
+            {result && !isReplaying && (
                 <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/60 backdrop-blur-sm pointer-events-none">
                     <div className="text-6xl font-black text-white mb-2" style={{ color: result.score >= 92.0 ? '#4ade80' : '#f87171' }}>
                         {result.score.toFixed(1)}%
