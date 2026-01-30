@@ -2,7 +2,7 @@ import React, { useRef, useEffect, useState } from 'react';
 import { Level } from '../lib/shapes';
 import { calculateScore, Point } from '../lib/geometry';
 import { Difficulty } from '../types';
-import { Check, Play, X, Loader2 } from 'lucide-react';
+import { Check, Play, X, Loader2, RefreshCcw } from 'lucide-react';
 
 interface CanvasBoardProps {
     level: Level;
@@ -247,6 +247,13 @@ export const CanvasBoard: React.FC<CanvasBoardProps> = ({ level, difficulty, onC
 
 
 
+    const reset = () => {
+        stopReplay();
+        setPoints([]);
+        setResult(null);
+        setIsDrawing(false);
+    };
+
     return (
         <div className="relative w-full h-full flex flex-col items-center justify-center">
             <canvas
@@ -277,6 +284,13 @@ export const CanvasBoard: React.FC<CanvasBoardProps> = ({ level, difficulty, onC
                             className="p-4 rounded-full bg-white/10 hover:bg-white/20 transition-colors"
                         >
                             <Play className="w-6 h-6 text-white" />
+                        </button>
+
+                        <button
+                            onClick={reset}
+                            className="p-4 rounded-full bg-white/10 hover:bg-white/20 transition-colors"
+                        >
+                            <RefreshCcw className="w-6 h-6 text-white" />
                         </button>
 
                         {result.score >= level.unlockScore && onNext && (
