@@ -290,42 +290,7 @@ const levels: Level[] = [
         id: 23,
         name: "The Capsule",
         description: "Smooth ends.",
-        shape: (() => {
-            const pts: Point[] = [];
-            const r = 0.15;
-            // Top Arc
-            for (let i = 0; i <= 30; i++) {
-                const a = Math.PI + (i * Math.PI) / 30;
-                pts.push({ x: 0.5 + r * Math.cos(a), y: 0.3 + r * Math.sin(a) }); // Top center
-            }
-            // Actually a capsule is vertical usually? Let's do Vertical.
-            // Top semi circle centered at (0.5, 0.3)
-            for (let i = 0; i <= 30; i++) {
-                const a = Math.PI + (i * Math.PI / 30);
-                // Wait, standard angle is 0 at right. PI is left.
-                // We want top arc. From PI (left) to 0 (right)? That's bottom arc? 
-                // Top arc is from 0 to -PI (counter clock) or PI to 2PI.
-                // Let's do Top center at y=0.3. Right side is 0, Top is -PI/2, Left is -PI.
-                // Arc from 0 to -PI via Top.
-                const ang = -i * Math.PI / 30;
-                pts.push({ x: 0.5 + r * Math.cos(ang), y: 0.3 + r * Math.sin(ang) });
-            }
-            // Bottom arc center at (0.5, 0.7)
-            // From -PI to 0 (bottom half)? 
-            // Line to bottom rect right.
-            pts.push({ x: 0.5 + r, y: 0.7 });
-            // Bottom arc
-            for (let i = 0; i <= 30; i++) {
-                const ang = 0 + (i * Math.PI / 30);
-                pts.push({ x: 0.5 + r * Math.cos(ang), y: 0.7 + r * Math.sin(ang) });
-            }
-            // Line back to top left?
-            pts.push({ x: 0.5 - r, y: 0.3 });
-            // This is getting complex to hand code in mind.
-            // Let's use simpler Ellipse/Rect combo or just high res points.
-            // Let's stick to a Vertical Pill.
-            return createEllipse(0.15, 0.3); // Simple Capsule-ish ellipse is fine for now
-        })(),
+        shape: createEllipse(0.15, 0.3),
         unlockScore: 92.0
     },
     {
