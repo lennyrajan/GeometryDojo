@@ -268,7 +268,7 @@ export const CanvasBoard: React.FC<CanvasBoardProps> = ({ level, difficulty, onC
 
             {/* Result Overlay */}
             {result && !isReplaying && (
-                <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/60 backdrop-blur-sm pointer-events-none">
+                <div className={`absolute inset-0 flex flex-col items-center justify-center backdrop-blur-sm pointer-events-none ${theme === 'space' ? 'bg-indigo-950/80' : 'bg-black/80'}`}>
                     <div className="text-6xl font-black text-white mb-2" style={{ color: result.score >= 92.0 ? '#4ade80' : '#f87171' }}>
                         {result.score.toFixed(1)}%
                     </div>
