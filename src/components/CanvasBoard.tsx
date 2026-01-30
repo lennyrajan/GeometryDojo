@@ -10,9 +10,10 @@ interface CanvasBoardProps {
     onComplete: (score: number) => void;
     onNext?: () => void;
     bestScore?: number;
+    theme?: 'space' | 'classic'; // Optional to avoid breaking replay if strict
 }
 
-export const CanvasBoard: React.FC<CanvasBoardProps> = ({ level, difficulty, onComplete, onNext }) => {
+export const CanvasBoard: React.FC<CanvasBoardProps> = ({ level, difficulty, onComplete, onNext, theme = 'space' }) => {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const [isDrawing, setIsDrawing] = useState(false);
     const [points, setPoints] = useState<Point[]>([]);
@@ -314,6 +315,61 @@ export const CanvasBoard: React.FC<CanvasBoardProps> = ({ level, difficulty, onC
                 </div>
             )}
 
+            {/* Controls */}
+            <div className="flex justify-between items-center px-6 pb-8">
+                <button
+                    onClick={() => {
+                        setPoints([]);
+                        setResult(null);
+                        setIsDrawing(false);
+                        stopReplay();
+                        draw();
+                    }}
+                    className={`p-4 rounded-full transition-all active:scale-95 ${theme === 'space' ? 'bg-white/10 hover:bg-white/20 text-white' : 'bg-zinc-900 border border-zinc-800 text-zinc-400 hover:text-white'}`}
+                >
+                    <RefreshCcw className="w-6 h-6" />
+                </button>
+
+                {result && !isDrawing && (
+                    <div className="flex gap-4 animate-in slide-in-from-bottom-4 fade-in duration-300">
+                        <button
+                            onClick={startReplay}
+                            disabled={isReplaying}
+                            className={`px-6 py-3 rounded-full font-bold uppercase tracking-wider text-sm transition-all flex items-center gap-2 ${isReplaying
+                                ? 'bg-zinc-800 text-zinc-500 cursor-not-allowed'
+                                : theme === 'space'
+                                    ? 'bg-indigo-500 hover:bg-indigo-400 text-white shadow-lg shadow-indigo-500/30'
+                                    : 'bg-zinc-100 text-black hover:bg-white'
+                                }`}
+                        >
+                            {isReplaying ? (
+                                <>
+                                    <RefreshCcw className="w-4 h-4 animate-spin" />
+                                    Replaying
+                                </>
+                            ) : (
+                                <>
+                                    <Play className="w-4 h-4" />
+                                    Replay
+                                </>
+                            )}
+                        </button>
+
+                        {onNext && result.score >= 92 && (
+                            <button
+                                onClick={onNext}
+                                className={`px-8 py-3 rounded-full font-bold uppercase tracking-wider text-sm transition-all flex items-center gap-2 ${theme === 'space'
+                                    ? 'bg-emerald-500 hover:bg-emerald-400 text-white shadow-lg shadow-emerald-500/30'
+                                    : 'bg-green-500 hover:bg-green-400 text-black'
+                                    }`}
+                            >
+                                <Check className="w-5 h-5" />
+                                Next
+                            </button>
+                        )}
+                    </div>
+                )}
+            </div>
             {/* Guide Text if empty */}
             {points.length === 0 && !result && (
                 <div className="absolute bottom-12 text-white/30 text-sm pointer-events-none animate-pulse">

@@ -9,9 +9,12 @@ interface LevelGridProps {
     onSelectLevel: (level: Level) => void;
     onReset: () => void;
     onViewLeaderboard: () => void;
+    onOpenSettings: () => void;
+    activeDifficulty: Difficulty; // For title color
+    theme: 'space' | 'classic';
 }
 
-export const LevelGrid: React.FC<LevelGridProps> = ({ unlockedLevels, scores, onSelectLevel, onReset, onViewLeaderboard }) => {
+export const LevelGrid: React.FC<LevelGridProps> = ({ unlockedLevels, scores, onSelectLevel, onReset, onViewLeaderboard, onOpenSettings, activeDifficulty, theme }) => {
     return (
         <div className="p-4 h-full flex flex-col">
             <div className="flex justify-between items-start mb-4">
@@ -25,17 +28,17 @@ export const LevelGrid: React.FC<LevelGridProps> = ({ unlockedLevels, scores, on
                 <div className="flex gap-2">
                     <button
                         onClick={onViewLeaderboard}
-                        className="p-2 bg-zinc-900 rounded-full hover:bg-zinc-800 transition-colors border border-zinc-800"
+                        className={`p-2 rounded-full transition-colors border ${theme === 'space' ? 'bg-white/10 border-white/10 hover:bg-white/20' : 'bg-zinc-900 border-zinc-800 hover:bg-zinc-800'}`}
                         title="Leaderboard"
                     >
                         <Trophy className="w-4 h-4 text-yellow-500" />
                     </button>
                     <button
-                        onClick={onReset}
-                        className="p-2 bg-zinc-900 rounded-full hover:bg-zinc-800 transition-colors border border-zinc-800"
+                        onClick={onOpenSettings}
+                        className={`p-2 rounded-full transition-colors border ${theme === 'space' ? 'bg-white/10 border-white/10 hover:bg-white/20' : 'bg-zinc-900 border-zinc-800 hover:bg-zinc-800'}`}
                         title="Settings"
                     >
-                        <Settings className="w-4 h-4 text-zinc-400" />
+                        <Settings className={`w-4 h-4 ${theme === 'space' ? 'text-indigo-200' : 'text-zinc-400'}`} />
                     </button>
                 </div>
             </div>
@@ -55,8 +58,12 @@ export const LevelGrid: React.FC<LevelGridProps> = ({ unlockedLevels, scores, on
                                 className={`
                     relative rounded-xl p-3 flex flex-col items-center justify-center gap-1 border transition-all h-24
                     ${isUnlocked
-                                        ? 'bg-zinc-900 border-zinc-800 hover:border-zinc-700 active:scale-95'
-                                        : 'bg-zinc-950 border-zinc-900 opacity-50 cursor-not-allowed'}
+                                        ? theme === 'space'
+                                            ? 'bg-white/5 border-white/10 hover:bg-white/10 hover:border-white/20 active:scale-95'
+                                            : 'bg-zinc-900 border-zinc-800 hover:border-zinc-700 active:scale-95'
+                                        : theme === 'space'
+                                            ? 'bg-black/20 border-white/5 opacity-50 cursor-not-allowed'
+                                            : 'bg-zinc-950 border-zinc-900 opacity-50 cursor-not-allowed'}
                   `}
                             >
                                 <div className="text-2xl mb-1 font-thin text-zinc-500">

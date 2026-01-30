@@ -11,9 +11,10 @@ interface LeaderboardProps {
     playerName: string | null;
     onBack: () => void;
     initialDifficulty: Difficulty;
+    theme: 'space' | 'classic';
 }
 
-export const Leaderboard: React.FC<LeaderboardProps> = ({ allScores, playerName, onBack, initialDifficulty }) => {
+export const Leaderboard: React.FC<LeaderboardProps> = ({ allScores, playerName, onBack, initialDifficulty, theme }) => {
     // Local state for viewing, disjoint from global game difficulty
     const [viewDifficulty, setViewDifficulty] = useState<Difficulty>(initialDifficulty);
 
@@ -37,14 +38,14 @@ export const Leaderboard: React.FC<LeaderboardProps> = ({ allScores, playerName,
     ];
 
     return (
-        <div className="flex flex-col h-full overflow-hidden bg-zinc-950 text-white">
+        <div className={`flex flex-col h-full overflow-hidden ${theme === 'space' ? 'bg-indigo-950 text-white' : 'bg-zinc-950 text-white'}`}>
             {/* Header */}
             <div className="flex items-center gap-4 p-6 pb-2 shrink-0">
                 <button
                     onClick={onBack}
-                    className="p-2 bg-zinc-900/50 rounded-full hover:bg-zinc-800 transition-colors border border-zinc-800"
+                    className={`p-2 rounded-full transition-colors border ${theme === 'space' ? 'bg-white/10 border-white/10 hover:bg-white/20' : 'bg-zinc-900/50 border-zinc-800 hover:bg-zinc-800'}`}
                 >
-                    <ArrowLeft className="w-5 h-5 text-zinc-400" />
+                    <ArrowLeft className={`w-5 h-5 ${theme === 'space' ? 'text-indigo-200' : 'text-zinc-400'}`} />
                 </button>
                 <h1 className="text-2xl font-bold">Leaderboard</h1>
             </div>

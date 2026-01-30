@@ -25,7 +25,9 @@ function App() {
         addPlayer,
         switchPlayer,
         activePlayer,
-        deletePlayer
+        deletePlayer,
+        theme,
+        toggleTheme
     } = useGameStore();
 
 
@@ -72,12 +74,15 @@ function App() {
                 playerName={playerName}
                 onBack={() => setViewingLeaderboard(false)}
                 initialDifficulty={difficulty}
+                theme={theme}
             />
         );
     }
 
+    const bgClass = theme === 'space' ? 'bg-indigo-950' : 'bg-zinc-950';
+
     return (
-        <div className={`w-full h-screen bg-zinc-950 text-white overflow-hidden flex flex-col transition-colors duration-500`}>
+        <div className={`w-full h-screen ${bgClass} text-white overflow-hidden flex flex-col transition-colors duration-500`}>
             {/* Settings Modal */}
             {showingSettings && (
                 <SettingsMenu
@@ -97,6 +102,8 @@ function App() {
                     onAddPlayer={addPlayer}
                     onSwitchPlayer={switchPlayer}
                     onDeletePlayer={deletePlayer}
+                    theme={theme}
+                    toggleTheme={toggleTheme}
                 />
             )}
 
@@ -148,20 +155,23 @@ function App() {
             {/* Game Board */}
             {currentLevel ? (
                 <CanvasBoard
-                    key={`${currentLevel.id}-${resetKey}`}
                     level={currentLevel}
-                    difficulty={difficulty}
-                    bestScore={scores[currentLevel.id]}
-                    onComplete={(score) => handleLevelComplete(score)}
+                    onComplete={handleLevelComplete}
                     onNext={handleNextLevel}
+                    difficulty={difficulty}
+                    key={resetKey}
+                    theme={theme}
                 />
             ) : (
                 <LevelGrid
+                    levels={levels}
                     unlockedLevels={unlockedLevels}
-                    scores={scores}
-                    onSelectLevel={handleLevelSelect}
-                    onReset={() => setShowingSettings(true)}
-                    onViewLeaderboard={() => setViewingLeaderboard(true)}
+                    scores={scores[difficulty]}
+                    onLevelSelect={handleLevelSelect}
+                    onOpenLeaderboard={() => setViewingLeaderboard(true)}
+                    onOpenSettings={() => setShowingSettings(true)}
+                    activeDifficulty={difficulty}
+                    theme={theme}
                 />
             )}
         </div>

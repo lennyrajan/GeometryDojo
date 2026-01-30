@@ -57,7 +57,7 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onComplete }) => {
                     <form onSubmit={handleSubmit} className="space-y-6">
                         <div className="space-y-2">
                             <label className="text-xs font-bold text-indigo-200/50 uppercase tracking-widest ml-1">
-                                Agent Identity
+                                Student Name
                             </label>
                             <input
                                 type="text"
@@ -66,7 +66,7 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onComplete }) => {
                                     setName(e.target.value);
                                     setError('');
                                 }}
-                                placeholder="Enter Codename..."
+                                placeholder="Enter Name..."
                                 className="w-full bg-black/20 border border-white/10 rounded-xl px-4 py-4 text-white placeholder-white/20 focus:outline-none focus:bg-black/40 focus:border-indigo-500/50 transition-all font-medium text-lg"
                                 autoFocus
                             />
@@ -78,7 +78,7 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onComplete }) => {
 
                         <div className="space-y-3">
                             <label className="text-xs font-bold text-indigo-200/50 uppercase tracking-widest ml-1">
-                                Calibration Level
+                                Difficulty
                             </label>
                             <div className="grid grid-cols-3 gap-3">
                                 {(['easy', 'medium', 'hard'] as Difficulty[]).map((d) => (

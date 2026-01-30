@@ -14,11 +14,13 @@ interface SettingsMenuProps {
     onAddPlayer: (name: string) => void;
     onSwitchPlayer: (id: string) => void;
     onDeletePlayer: (id: string) => void;
+    theme: 'space' | 'classic';
+    toggleTheme: () => void;
 }
 
 export const SettingsMenu: React.FC<SettingsMenuProps> = ({
     currentDifficulty, onSetDifficulty, onClose, onClearLeaderboard, onFactoryReset,
-    players, activePlayerId, onAddPlayer, onSwitchPlayer, onDeletePlayer
+    players, activePlayerId, onAddPlayer, onSwitchPlayer, onDeletePlayer, theme, toggleTheme
 }) => {
 
     const [isAddingUser, setIsAddingUser] = useState(false);
@@ -41,7 +43,8 @@ export const SettingsMenu: React.FC<SettingsMenuProps> = ({
 
     return (
         <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4 backdrop-blur-sm">
-            <div className={`w-full max-w-sm rounded-2xl shadow-2xl animate-in zoom-in-95 duration-200 bg-zinc-950 border border-zinc-800 text-white max-h-[85vh] flex flex-col`}>
+            <div className={`w-full max-w-sm rounded-2xl shadow-2xl animate-in zoom-in-95 duration-200 border text-white max-h-[85vh] flex flex-col ${theme === 'space' ? 'bg-indigo-950 border-indigo-800' : 'bg-zinc-950 border-zinc-800'
+                }`}>
 
                 {/* Fixed Header */}
                 <div className="p-4 border-b border-white/10 flex items-center justify-between shrink-0">
@@ -141,6 +144,40 @@ export const SettingsMenu: React.FC<SettingsMenuProps> = ({
                                     </button>
                                 )
                             )}
+                        </div>
+                    </div>
+
+                    {/* Theme Toggle */}
+                    <div>
+                        <div className="flex items-center gap-2 mb-2">
+                            <Monitor className="w-3.5 h-3.5 text-zinc-400" />
+                            <h3 className="text-xs font-medium opacity-60 uppercase tracking-wider">Visual Theme</h3>
+                        </div>
+                        <div className="grid grid-cols-2 gap-2">
+                            <button
+                                onClick={() => theme !== 'space' && toggleTheme()}
+                                className={`p-3 rounded-xl border flex flex-col items-center gap-2 transition-all ${theme === 'space'
+                                    ? 'bg-indigo-600 border-indigo-500 shadow-lg shadow-indigo-900/50'
+                                    : 'bg-zinc-900 border-zinc-800 text-zinc-400 hover:bg-zinc-800'
+                                    }`}
+                            >
+                                <div className={`w-8 h-8 rounded-full flex items-center justify-center ${theme === 'space' ? 'bg-indigo-500' : 'bg-zinc-800'}`}>
+                                    <div className="w-4 h-4 bg-white rounded-full animate-pulse" />
+                                </div>
+                                <span className="text-xs font-bold">Space</span>
+                            </button>
+                            <button
+                                onClick={() => theme !== 'classic' && toggleTheme()}
+                                className={`p-3 rounded-xl border flex flex-col items-center gap-2 transition-all ${theme === 'classic'
+                                    ? 'bg-zinc-100 text-black border-white shadow-lg'
+                                    : 'bg-zinc-900 border-zinc-800 text-zinc-400 hover:bg-zinc-800'
+                                    }`}
+                            >
+                                <div className={`w-8 h-8 rounded-full flex items-center justify-center ${theme === 'classic' ? 'bg-black text-white' : 'bg-zinc-800'}`}>
+                                    <div className="w-4 h-4 border-2 border-current rounded-full" />
+                                </div>
+                                <span className="text-xs font-bold">Classic</span>
+                            </button>
                         </div>
                     </div>
 
