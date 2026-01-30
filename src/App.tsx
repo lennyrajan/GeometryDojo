@@ -2,13 +2,15 @@ import { useState } from 'react';
 import { useGameStore } from './hooks/useGameStore';
 import { LevelGrid } from './components/LevelGrid';
 import { CanvasBoard } from './components/CanvasBoard';
+import { Leaderboard } from './components/Leaderboard';
 import { Level } from './lib/shapes';
 import levels from './lib/shapes';
 import { ArrowLeft } from 'lucide-react';
 
 function App() {
-    const { unlockedLevels, scores, submitScore } = useGameStore();
+    const { unlockedLevels, scores, submitScore, resetProgress } = useGameStore();
     const [currentLevel, setCurrentLevel] = useState<Level | null>(null);
+    const [viewingLeaderboard, setViewingLeaderboard] = useState(false);
 
     const handleLevelSelect = (level: Level) => {
         setCurrentLevel(level);
@@ -27,15 +29,23 @@ function App() {
             if (nextLevel && unlockedLevels.includes(nextId)) {
                 setCurrentLevel(nextLevel);
             } else {
-                // Just go back to menu if no next level or locked (shouldn't happen if score > 99.5)
                 setCurrentLevel(null);
             }
         }
     };
 
+    if (viewingLeaderboard) {
+        return (
+            <Leaderboard
+                scores={scores}
+                onBack={() => setViewingLeaderboard(false)}
+            />
+        );
+    }
+
     return (
         <div className="w-full h-screen bg-black overflow-hidden flex flex-col">
-            {/* Header (Only show if in game, or maybe always?) */}
+            {/* Game Header */}
             {currentLevel && (
                 <div className="absolute top-0 left-0 right-0 z-50 p-4 flex justify-between items-center pointer-events-none">
                     <button
@@ -44,6 +54,12 @@ function App() {
                     >
                         <ArrowLeft className="w-6 h-6" />
                     </button>
+
+                    <div className="pointer-events-auto px-4 py-2 bg-black/30 backdrop-blur rounded-full">
+                        <span className="text-white font-bold text-sm tracking-widest uppercase opacity-80">
+                            {currentLevel.name}
+                        </span>
+                    </div>
 
                     <div className="pointer-events-auto flex items-center gap-2 bg-black/50 backdrop-blur px-4 py-2 rounded-full border border-white/10">
                         <span className="text-zinc-400 text-xs uppercase tracking-wider">Best:</span>
@@ -66,6 +82,8 @@ function App() {
                     unlockedLevels={unlockedLevels}
                     scores={scores}
                     onSelectLevel={handleLevelSelect}
+                    onReset={resetProgress}
+                    onViewLeaderboard={() => setViewingLeaderboard(true)}
                 />
             )}
         </div>
