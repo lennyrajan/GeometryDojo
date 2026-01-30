@@ -63,7 +63,7 @@ export const LevelGrid: React.FC<LevelGridProps> = ({ unlockedLevels, scores, on
                                 disabled={!isUnlocked}
                                 onClick={() => onSelectLevel(level)}
                                 className={`
-                    relative rounded-xl p-3 flex flex-col items-center justify-center gap-1 border transition-all h-24
+                    relative rounded-xl p-3 flex flex-col items-center justify-center gap-1 border transition-all min-h-24
                     ${isUnlocked
                                         ? theme === 'space'
                                             ? 'bg-white/5 border-white/10 hover:bg-white/10 hover:border-white/20 active:scale-95'
@@ -77,7 +77,7 @@ export const LevelGrid: React.FC<LevelGridProps> = ({ unlockedLevels, scores, on
                                     {level.id}
                                 </div>
 
-                                <div className="text-xs font-medium text-zinc-300 text-center truncate w-full px-1">
+                                <div className="text-xs font-medium text-zinc-300 text-center w-full px-1">
                                     {level.name}
                                 </div>
 
