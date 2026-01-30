@@ -28,7 +28,7 @@ interface GameState {
 
 const defaultPlayer: PlayerProfile = {
     id: 'player-1',
-    name: 'Player 1',
+    name: '', // Empty name triggers Welcome Screen
     scores: { easy: {}, medium: {}, hard: {} },
     unlockedLevels: { easy: [1], medium: [1], hard: [1] }
 };
