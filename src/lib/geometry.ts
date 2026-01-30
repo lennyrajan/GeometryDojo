@@ -206,7 +206,7 @@ export const calculateScore = (
             spatialPenaltyMultiplier = 0.8;
             break;
         case 'medium':
-            angleTolerance = 15; // Standard
+            angleTolerance = 20; // Relaxed for better "human" feel on curves
             maxAngleWeight = 1.0;
             avgAngleWeight = 0.2;
             spatialPenaltyMultiplier = 1.0;

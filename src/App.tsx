@@ -7,7 +7,7 @@ import { WelcomeScreen } from './components/WelcomeScreen';
 import { SettingsMenu } from './components/SettingsMenu';
 import { Level } from './lib/shapes';
 import levels from './lib/shapes';
-import { ArrowLeft, RefreshCcw } from 'lucide-react';
+import { ArrowLeft, RefreshCcw, Info, X } from 'lucide-react';
 
 function App() {
 
@@ -35,6 +35,7 @@ function App() {
     const [viewingLeaderboard, setViewingLeaderboard] = useState(false);
     const [showingSettings, setShowingSettings] = useState(false);
     const [resetKey, setResetKey] = useState(0);
+    const [showFact, setShowFact] = useState(false);
 
     const handleLevelSelect = (level: Level) => {
         setCurrentLevel(level);
