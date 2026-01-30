@@ -57,7 +57,7 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onComplete }) => {
                     <form onSubmit={handleSubmit} className="space-y-6">
                         <div className="space-y-2">
                             <label className="text-xs font-bold text-indigo-200/50 uppercase tracking-widest ml-1">
-                                Student Name
+                                Player Name
                             </label>
                             <input
                                 type="text"
