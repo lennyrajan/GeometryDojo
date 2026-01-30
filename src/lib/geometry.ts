@@ -15,13 +15,11 @@ export const resample = (path: Point[], count: number = 100): Point[] => {
     if (path.length < 2) return path;
 
     const totalLen = getPathLength(path);
-    const step = totalLen / (count - 1);
     // Simplified approach: walk the path and pick points
 
     // Re-implementation of standard resampling
     // We'll use a simpler approach: walk the path and pick points
     const result: Point[] = [path[0]];
-    let distSoFar = 0;
     let pointIdx = 0;
     const interval = totalLen / (count - 1);
 
