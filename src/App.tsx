@@ -19,7 +19,6 @@ function App() {
         setPlayerName,
         theme,
         setTheme,
-        resetProgress,
         clearLeaderboard,
         factoryReset
     } = useGameStore();

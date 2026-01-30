@@ -1,5 +1,5 @@
 import React from 'react';
-import { Settings, X, Trash2, UserPlus, Monitor } from 'lucide-react';
+import { Settings, X, Trash2, Monitor } from 'lucide-react';
 import { Theme } from '../hooks/useGameStore';
 
 interface SettingsMenuProps {
@@ -50,8 +50,8 @@ export const SettingsMenu: React.FC<SettingsMenuProps> = ({
                                 key={t.id}
                                 onClick={() => onSetTheme(t.id)}
                                 className={`p-4 rounded-xl border-2 flex items-center justify-center transition-all ${currentTheme === t.id
-                                        ? 'border-lime-500 ring-2 ring-lime-500/20'
-                                        : 'border-transparent hover:border-zinc-700'
+                                    ? 'border-lime-500 ring-2 ring-lime-500/20'
+                                    : 'border-transparent hover:border-zinc-700'
                                     } ${t.color}`}
                             >
                                 <span className="font-semibold">{t.name}</span>
