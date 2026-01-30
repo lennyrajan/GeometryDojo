@@ -27,11 +27,13 @@ interface GameState {
     theme: 'space' | 'classic';
 }
 
+const ALL_LEVELS_HACK = Array.from({ length: 20 }, (_, i) => i + 1);
+
 const defaultPlayer: PlayerProfile = {
     id: 'player-1',
     name: '', // Empty name triggers Welcome Screen
     scores: { easy: {}, medium: {}, hard: {} },
-    unlockedLevels: { easy: [1], medium: [1], hard: [1] }
+    unlockedLevels: { easy: ALL_LEVELS_HACK, medium: ALL_LEVELS_HACK, hard: ALL_LEVELS_HACK }
 };
 
 const defaultState: GameState = {
@@ -153,7 +155,7 @@ export const useGameStore = () => {
             id: newId,
             name,
             scores: { easy: {}, medium: {}, hard: {} },
-            unlockedLevels: { easy: [1], medium: [1], hard: [1] }
+            unlockedLevels: { easy: ALL_LEVELS_HACK, medium: ALL_LEVELS_HACK, hard: ALL_LEVELS_HACK }
         };
         setState((prev: GameState) => ({
             ...prev,
