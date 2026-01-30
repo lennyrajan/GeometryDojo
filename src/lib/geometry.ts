@@ -200,13 +200,13 @@ export const calculateScore = (
 
     switch (difficulty) {
         case 'easy':
-            angleTolerance = 45; // Very forgiving
+            angleTolerance = 30; // Very forgiving
             maxAngleWeight = 0.8;
             avgAngleWeight = 0.1;
             spatialPenaltyMultiplier = 0.8;
             break;
         case 'medium':
-            angleTolerance = 30; // Standard
+            angleTolerance = 15; // Standard
             maxAngleWeight = 1.0;
             avgAngleWeight = 0.2;
             spatialPenaltyMultiplier = 1.0;
