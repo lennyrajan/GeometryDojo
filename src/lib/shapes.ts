@@ -26,7 +26,7 @@ const levels: Level[] = [
         name: "The Straight Line",
         description: "The foundation of all geometry.",
         shape: [{ x: 0.2, y: 0.5 }, { x: 0.8, y: 0.5 }],
-        unlockScore: 99.5
+        unlockScore: 92.0
     },
     {
         id: 2,
@@ -39,7 +39,7 @@ const levels: Level[] = [
             { x: 0.25, y: 0.75 },
             { x: 0.25, y: 0.25 }
         ],
-        unlockScore: 99.5
+        unlockScore: 92.0
     },
     {
         id: 3,
@@ -52,49 +52,49 @@ const levels: Level[] = [
             { x: 0.2, y: 0.7 },
             { x: 0.2, y: 0.3 }
         ],
-        unlockScore: 99.5
+        unlockScore: 92.0
     },
     {
         id: 4,
         name: "Equilateral Triangle",
         description: "Three sharp 60° angles.",
         shape: createPoly(3, 0.35, { x: 0.5, y: 0.6 }, -Math.PI / 2), // Adjust center to look good
-        unlockScore: 99.5
+        unlockScore: 92.0
     },
     {
         id: 5,
         name: "The Hexagon",
         description: "Six sides, very symmetrical.",
         shape: createPoly(6),
-        unlockScore: 99.5
+        unlockScore: 92.0
     },
     {
         id: 6,
         name: "The Pentagon",
         description: "The first odd challenge.",
         shape: createPoly(5),
-        unlockScore: 99.5
+        unlockScore: 92.0
     },
     {
         id: 7,
         name: "The Octagon",
         description: "Common, but hard to keep even.",
         shape: createPoly(8),
-        unlockScore: 99.5
+        unlockScore: 92.0
     },
     {
         id: 8,
         name: "The Septagon",
         description: "Seven sides. Pure chaos.",
         shape: createPoly(7),
-        unlockScore: 99.5
+        unlockScore: 92.0
     },
     {
         id: 9,
         name: "The Circle",
         description: "The ultimate test of steady motion.",
         shape: createPoly(60), // High res polygon = circle
-        unlockScore: 99.5
+        unlockScore: 92.0
     },
     {
         id: 10,

@@ -209,7 +209,7 @@ export const CanvasBoard: React.FC<CanvasBoardProps> = ({ level, onComplete, onN
         onComplete(res.score);
 
         if (navigator.vibrate) {
-            if (res.score >= 99.5) {
+            if (res.score >= 92.0) {
                 navigator.vibrate([100, 50, 100]);
             } else {
                 navigator.vibrate(200);
@@ -254,11 +254,11 @@ export const CanvasBoard: React.FC<CanvasBoardProps> = ({ level, onComplete, onN
             {/* Result Overlay */}
             {result && !isZooming && (
                 <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/60 backdrop-blur-sm pointer-events-none">
-                    <div className="text-6xl font-black text-white mb-2" style={{ color: result.score >= 99.5 ? '#4ade80' : '#f87171' }}>
+                    <div className="text-6xl font-black text-white mb-2" style={{ color: result.score >= 92.0 ? '#4ade80' : '#f87171' }}>
                         {result.score.toFixed(1)}%
                     </div>
                     <div className="text-white/70 mb-8 font-mono">
-                        {result.score >= 99.5 ? "PERFECT" : "TRY AGAIN"}
+                        {result.score >= 92.0 ? "PASSED" : "TRY AGAIN"}
                     </div>
 
                     <div className="flex gap-4 pointer-events-auto">

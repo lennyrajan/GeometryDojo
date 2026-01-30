@@ -28,7 +28,7 @@ export const useGameStore = () => {
             const newScores = { ...prev.scores, [levelId]: best };
 
             const newUnlocked = [...prev.unlockedLevels];
-            if (score >= 99.5) {
+            if (score >= 92.0) {
                 // Unlock next level
                 if (!newUnlocked.includes(levelId + 1)) {
                     newUnlocked.push(levelId + 1);

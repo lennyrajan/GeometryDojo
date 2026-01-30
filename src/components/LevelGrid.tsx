@@ -42,7 +42,7 @@ export const LevelGrid: React.FC<LevelGridProps> = ({ unlockedLevels, scores, on
                             </div>
 
                             {isUnlocked && (
-                                <div className={`text-xs font-mono font-bold ${score >= 99.5 ? "text-green-500" : "text-zinc-600"}`}>
+                                <div className={`text-xs font-mono font-bold ${score >= 92.0 ? "text-green-500" : "text-zinc-600"}`}>
                                     {score > 0 ? `${score.toFixed(1)}%` : "0.0%"}
                                 </div>
                             )}
