@@ -317,31 +317,7 @@ const levels: Level[] = [
             // Part 2: Top Semicircle (CCW)
             // Center (0.5, 0.35). Angle 0 to PI.
             for (let i = 0; i <= segments; i++) {
-                const ang = 0 + (Math.PI - 0) * (i / segments);
-                // Wait, 0 is Right. PI is Left.
-                // But we are at Top.
-                // Math.cos(0) = 1 (Right). 
-                // So angle 0 corresponds to (0.65, 0.35). Correct.
-                // Angle PI corresponds to (0.35, 0.35). Correct.
-                // We want the arc to go UP. sin(ang) > 0? No, y is inverted in screen coords?
-                // Screen coords: Y increases DOWN.
-                // So sin(0..PI) is Positive (Down).
-                // We want the Top arc (y < 0.35).
-                // So we need sin to be negative relative to center.
-                // So angle range: -PI? No.
-                // Center y=0.35. Top is 0.2.
-                // We need y = 0.35 + r*sin(theta).
-                // If theta=0..PI, sin is 0..1..0. y = 0.35..0.5..0.35. That's expanding DOWN.
-                // We want expanding UP (Y < 0.35).
-                // So typical math angle wrapping.
-                // We need range that gives negative sin.
-                // PI to 2PI (or -PI to 0).
-                // Left is PI. Right is 2PI (0).
-                // We are at Right (0). We want to go to Left (PI) via Top.
-                // So we go 2PI -> PI? No, 0 -> -PI.
-                // Or: Y = cy - r*sin(ang)? No, keep math standard.
-                // Standard: 0 (Right), -PI/2 (Up/Top), -PI (Left).
-                // So range: 0 down to -PI.
+                // Standard: 0 (Right) -> -PI (Left) via Top
                 const ang = 0 + (-Math.PI - 0) * (i / segments);
                 points.push({
                     x: cx + r * Math.cos(ang),
