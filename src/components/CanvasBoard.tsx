@@ -264,9 +264,7 @@ export const CanvasBoard: React.FC<CanvasBoardProps> = ({ level, difficulty, onC
             />
 
             {/* HUD during drawing */}
-            <div className="absolute top-4 left-4 text-white font-mono text-sm opacity-50 pointer-events-none">
-                {level.name}
-            </div>
+
 
             {/* Result Overlay */}
             {result && !isReplaying && (
