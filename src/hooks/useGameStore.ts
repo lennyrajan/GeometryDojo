@@ -58,6 +58,7 @@ export const useGameStore = () => {
 
     const setPlayerName = (name: string) => setState(prev => ({ ...prev, playerName: name }));
     const setTheme = (theme: Theme) => setState(prev => ({ ...prev, theme }));
+    const setDifficulty = (difficulty: Difficulty) => setState(prev => ({ ...prev, difficulty }));
 
     const resetProgress = () => setState(prev => ({
         ...prev,
@@ -79,6 +80,7 @@ export const useGameStore = () => {
         submitScore,
         setPlayerName,
         setTheme,
+        setDifficulty,
         resetProgress,
         clearLeaderboard,
         factoryReset

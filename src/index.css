@@ -7,10 +7,45 @@
     --background: 240 10% 3.9%;
     --foreground: 0 0% 98%;
     --primary: 142 76% 36%;
-    /* Green-ish for accuracy */
     --primary-foreground: 355.7 100% 97.3%;
     --success: 142 76% 36%;
     --success-foreground: 0 0% 98%;
+  }
+
+  /* Light Theme */
+  .theme-light {
+    --background: 0 0% 100%;
+    --foreground: 240 10% 3.9%;
+    --primary: 142 76% 36%;
+    /* Emerald */
+    --primary-foreground: 355.7 100% 97.3%;
+    --success: 142 76% 36%;
+    --success-foreground: 0 0% 98%;
+  }
+
+  /* Colorful Theme */
+  .theme-colorful {
+    --background: 260 50% 10%;
+    /* Deep Purple */
+    --foreground: 0 0% 100%;
+    --primary: 320 100% 50%;
+    /* Hot Pink */
+    --primary-foreground: 0 0% 100%;
+    --success: 320 100% 50%;
+    --success-foreground: 0 0% 100%;
+  }
+
+  /* Retro Theme */
+  .theme-retro {
+    --background: 40 50% 90%;
+    /* Beige */
+    --foreground: 20 50% 20%;
+    /* Brown */
+    --primary: 20 80% 50%;
+    /* Orange */
+    --primary-foreground: 40 50% 90%;
+    --success: 20 80% 50%;
+    --success-foreground: 40 50% 90%;
   }
 
   html,

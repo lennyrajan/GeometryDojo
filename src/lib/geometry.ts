@@ -94,130 +94,136 @@ export const fitToBox = (path: Point[], targetBox: { minX: number, maxX: number,
     }));
 };
 
-export const calculateScore = (userPath: Point[], targetPath: Point[]): { score: number, diffs: number[], alignedUserPath: Point[] } => {
-    // 1. Resample both to same count (e.g. 100)
-    const count = 100;
-    const userResampled = resample(userPath, count);
-    const targetResampled = resample(targetPath, count);
+export type Difficulty = 'easy' | 'medium' | 'hard';
 
-    // 2. Align (Fit user to target)
-    const targetBox = getBoundingBox(targetResampled);
-    const userAligned = fitToBox(userResampled, targetBox);
+const SAMPLING_POINTS = 100;
 
-    // 3. Compare with Cyclic Shift
-    // Improved algorithm: Try all cyclic shifts of the target path to find the best start-point alignment.
-    // Also check both normal and reversed directions for the user path.
+// Helper to get angle between three points
+const getAngle = (p1: Point, p2: Point, p3: Point) => {
+    const v1 = { x: p1.x - p2.x, y: p1.y - p2.y };
+    const v2 = { x: p3.x - p2.x, y: p3.y - p2.y };
+    const dot = v1.x * v2.x + v1.y * v2.y;
+    const mag1 = Math.sqrt(v1.x * v1.x + v1.y * v1.y);
+    const mag2 = Math.sqrt(v2.x * v2.x + v2.y * v2.y);
+    if (mag1 === 0 || mag2 === 0) return 180; // Straight line or point, treat as 180 for angle diff
+    const val = Math.max(-1, Math.min(1, dot / (mag1 * mag2)));
+    return (Math.acos(val) * 180) / Math.PI;
+};
 
-    let minTotalDist = Infinity;
-    let bestUserPath: Point[] = [];
-    let bestShift = 0;
-
-    // Helper to calc distance for a specific shift between two arrays of same length
-    const calcDist = (uPath: Point[], tPath: Point[], shift: number) => {
-        let d = 0;
-        for (let i = 0; i < count; i++) {
-            const tIdx = (i + shift) % count;
-            d += distance(uPath[i], tPath[tIdx]);
-        }
-        return d;
-    };
-
-    // Check Normal Direction
-    for (let shift = 0; shift < count; shift++) {
-        const d = calcDist(userAligned, targetResampled, shift);
-        if (d < minTotalDist) {
-            minTotalDist = d;
-            bestUserPath = userAligned; // Normal orientation
-            bestShift = shift;
-        }
-    }
-
-    // Check Reverse Direction
-    const userReversed = [...userAligned].reverse();
-    for (let shift = 0; shift < count; shift++) {
-        const d = calcDist(userReversed, targetResampled, shift);
-        if (d < minTotalDist) {
-            minTotalDist = d;
-            bestUserPath = userReversed;
-            bestShift = shift;
-        }
-    }
-
-    // Generate diffs for the best match
-    const diffs: number[] = [];
-    for (let i = 0; i < count; i++) {
-        const tIdx = (i + bestShift) % count;
-        diffs.push(distance(bestUserPath[i], targetResampled[tIdx]));
-    }
-
-    // For visualization, we need to return the user path aligned to the target.
-    // However, the `bestUserPath` is just reversed or not. The `diffs` correspond to comparing
-    // bestUserPath[i] with target[(i + shift) % N].
-    // To minimize complexity for the consumer (CanvasBoard), let's just return the bestUserPath,
-    // and the diffs array already matches it index-for-index against the *shifted* target.
-    // BUT the CanvasBoard draws the target as `level.shape`. It doesn't know about shifts.
-    // Actually, heatmap logic in CanvasBoard iterates 0..N of alignedUserPath and uses diffs[i].
-    // It draws the user path segment colors. The diff[i] says "how far was this user segment from the matched target segment".
-    // So if we just return bestUserPath and the corresponding diffs, the heatmap on the user's line will be correct.
-    // The target line (white/faint) is drawn separately and static. That is fine.
-
-    const avgDist = minTotalDist / count;
-
-    // Penalize systematic errors (like max deviation).
-    const maxDist = Math.max(...diffs);
-
-
-    // 4. Angular Analysis (Checking for geometric match)
-    const getAngle = (p1: Point, p2: Point, p3: Point) => {
-        const v1 = { x: p1.x - p2.x, y: p1.y - p2.y };
-        const v2 = { x: p3.x - p2.x, y: p3.y - p2.y };
-        const dot = v1.x * v2.x + v1.y * v2.y;
-        const mag1 = Math.sqrt(v1.x * v1.x + v1.y * v1.y);
-        const mag2 = Math.sqrt(v2.x * v2.x + v2.y * v2.y);
-        if (mag1 === 0 || mag2 === 0) return 180;
-        const val = Math.max(-1, Math.min(1, dot / (mag1 * mag2)));
-        return (Math.acos(val) * 180) / Math.PI;
-    };
-
+const scoreAlignment = (
+    userPath: Point[],
+    targetPath: Point[],
+    angleTolerance: number,
+    maxAngleWeight: number,
+    avgAngleWeight: number
+) => {
+    const count = userPath.length;
+    let totalDist = 0;
+    let maxDist = 0;
+    const diffs: number[] = []; // Store spatial diffs for heatmap
     const angleDiffs: number[] = [];
 
     for (let i = 0; i < count; i++) {
-        // Target Angle (using bestShift)
-        const tIdxPrev = (i + bestShift - 5 + count) % count;
-        const tIdxCurr = (i + bestShift) % count;
-        const tIdxNext = (i + bestShift + 5) % count;
-        const targetAngle = getAngle(targetResampled[tIdxPrev], targetResampled[tIdxCurr], targetResampled[tIdxNext]);
+        // Spatial Error
+        const dist = distance(userPath[i], targetPath[i]);
+        totalDist += dist;
+        maxDist = Math.max(maxDist, dist);
+        diffs.push(dist);
 
-        // User Angle (aligned)
-        const uIdxPrev = (i - 5 + count) % count;
-        const uIdxCurr = i;
-        const uIdxNext = (i + 5) % count;
-        const userAngle = getAngle(bestUserPath[uIdxPrev], bestUserPath[uIdxCurr], bestUserPath[uIdxNext]);
+        // Angular Error (Local curvature at this point)
+        // We look at prev, curr, next points to get the "corner" angle at i
+        // Use a larger step for angle calculation to smooth out noise
+        const angleStep = 5;
+        const uIdxPrev = (i - angleStep + count) % count;
+        const uIdxNext = (i + angleStep) % count;
+        const userAngle = getAngle(userPath[uIdxPrev], userPath[i], userPath[uIdxNext]);
+
+        const tIdxPrev = (i - angleStep + count) % count;
+        const tIdxNext = (i + angleStep) % count;
+        const targetAngle = getAngle(targetPath[tIdxPrev], targetPath[i], targetPath[tIdxNext]);
 
         // Calculate diff
         let diff = Math.abs(userAngle - targetAngle);
 
-        // IGNORE small deviations (Tolerance Buffer)
-        // Increased to 30 degrees to be more liberal with rounded corners.
-        // Circle vs Square (90 vs 180) is 90 diff. 90 - 30 = 60 penalty.
-        // Rounded Corner (135 vs 90) is 45 diff. 45 - 30 = 15 penalty.
-        diff = Math.max(0, diff - 30);
+        // IGNORE small deviations (Tolerance Buffer based on Difficulty)
+        diff = Math.max(0, diff - angleTolerance);
 
         angleDiffs.push(diff);
     }
 
     // Max Angle Deviation is the best indicator of "Missing a Corner"
-    const maxAngleDiff = Math.max(...angleDiffs);
-    const avgAngleDiff = angleDiffs.reduce((a, b) => a + b, 0) / count;
+    const maxAngleDiff = angleDiffs.length > 0 ? Math.max(...angleDiffs) : 0;
+    const avgAngleDiff = angleDiffs.length > 0 ? angleDiffs.reduce((a, b) => a + b, 0) / count : 0;
 
     // Scoring Formula
-    // AvgDist * 300: Base spatial match
-    // MaxDist * 50: Max spatial deviation
-    // MaxAngleDiff * 1.0: Max shape mismatch (missing a corner) - Reduced from 1.5
-    // AvgAngleDiff * 0.2: General shape mismatch - Reduced from 0.5
-
-    const totalPenalty = (avgDist * 300) + (maxDist * 50) + (maxAngleDiff * 1.0) + (avgAngleDiff * 0.2);
+    const avgDist = totalDist / count;
+    const totalPenalty = (avgDist * 300) + (maxDist * 50) + (maxAngleDiff * maxAngleWeight) + (avgAngleDiff * avgAngleWeight);
     const score = Math.max(0, 100 - totalPenalty);
 
-    return { score, diffs, alignedUserPath: bestUserPath };
+    return { score, diffs };
+};
+
+export const calculateScore = (
+    userPath: Point[],
+    targetPath: Point[],
+    difficulty: Difficulty = 'medium'
+): { score: number, diffs: number[], alignedUserPath: Point[] } => {
+    if (userPath.length < 2) return { score: 0, diffs: [], alignedUserPath: [] };
+
+    // 1. Resample
+    const resampledUser = resample(userPath, SAMPLING_POINTS);
+    const resampledTarget = resample(targetPath, SAMPLING_POINTS);
+
+    // 2. Fit User to Target Box
+    const targetBox = getBoundingBox(resampledTarget);
+    const normalizedUser = fitToBox(resampledUser, targetBox);
+    const normalizedTarget = resampledTarget; // Target is already the reference
+
+    // 3. Find Best Alignment (Cyclic Shift)
+    let bestScore = -Infinity;
+    let bestAlignedUserPath: Point[] = [];
+    let bestDiffs: number[] = [];
+
+    // Config based on Difficulty
+    let angleTolerance = 30;
+    let maxAngleWeight = 1.0;
+    let avgAngleWeight = 0.2;
+
+    switch (difficulty) {
+        case 'easy':
+            angleTolerance = 45; // Very forgiving
+            maxAngleWeight = 0.8;
+            avgAngleWeight = 0.1;
+            break;
+        case 'medium':
+            angleTolerance = 30; // Standard
+            maxAngleWeight = 1.0;
+            avgAngleWeight = 0.2;
+            break;
+        case 'hard':
+            angleTolerance = 15; // Strict
+            maxAngleWeight = 1.5;
+            avgAngleWeight = 0.3;
+            break;
+    }
+
+    // Optimization: We don't need to try EVERY alignment if we use a heuristic,
+    // but for 100 points, brute force is fast enough (~1-2ms).
+    // Also check both normal and reversed directions for the user path.
+    const userPathsToTest = [normalizedUser, [...normalizedUser].reverse()];
+
+    for (const path of userPathsToTest) {
+        for (let shift = 0; shift < SAMPLING_POINTS; shift++) {
+            const shiftedUser = [...path.slice(shift), ...path.slice(0, shift)];
+            const { score, diffs } = scoreAlignment(shiftedUser, normalizedTarget, angleTolerance, maxAngleWeight, avgAngleWeight);
+
+            if (score > bestScore) {
+                bestScore = score;
+                bestAlignedUserPath = shiftedUser;
+                bestDiffs = diffs;
+            }
+        }
+    }
+
+    return { score: bestScore, diffs: bestDiffs, alignedUserPath: bestAlignedUserPath };
 };

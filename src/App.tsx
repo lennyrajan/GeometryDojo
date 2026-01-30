@@ -19,6 +19,8 @@ function App() {
         setPlayerName,
         theme,
         setTheme,
+        difficulty,
+        setDifficulty,
         clearLeaderboard,
         factoryReset
     } = useGameStore();
@@ -51,7 +53,10 @@ function App() {
 
     // 1. Welcome Screen Check
     if (!playerName) {
-        return <WelcomeScreen onComplete={setPlayerName} />;
+        return <WelcomeScreen onComplete={(name, diff) => {
+            setPlayerName(name);
+            setDifficulty(diff);
+        }} />;
     }
 
     // 2. Leaderboard View
@@ -72,6 +77,8 @@ function App() {
                 <SettingsMenu
                     currentTheme={theme}
                     onSetTheme={setTheme}
+                    currentDifficulty={difficulty}
+                    onSetDifficulty={setDifficulty}
                     onClose={() => setShowingSettings(false)}
                     onClearLeaderboard={() => {
                         clearLeaderboard();
@@ -109,12 +116,14 @@ function App() {
                 </div>
             )}
 
+            {/* Game Board */}
             {currentLevel ? (
                 <CanvasBoard
                     level={currentLevel}
-                    onComplete={handleComplete}
-                    onNext={handleNext}
+                    difficulty={difficulty}
                     bestScore={scores[currentLevel.id]}
+                    onComplete={(score) => handleLevelComplete(currentLevel, score)}
+                    onNext={handleNextLevel}
                 />
             ) : (
                 <LevelGrid

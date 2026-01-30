@@ -1,17 +1,19 @@
 import React from 'react';
-import { Settings, X, Trash2, Monitor } from 'lucide-react';
-import { Theme } from '../hooks/useGameStore';
+import { Settings, X, Trash2, Monitor, Swords } from 'lucide-react';
+import { Theme, Difficulty } from '../hooks/useGameStore';
 
 interface SettingsMenuProps {
     currentTheme: Theme;
     onSetTheme: (theme: Theme) => void;
+    currentDifficulty: Difficulty;
+    onSetDifficulty: (diff: Difficulty) => void;
     onClose: () => void;
     onClearLeaderboard: () => void;
     onFactoryReset: () => void;
 }
 
 export const SettingsMenu: React.FC<SettingsMenuProps> = ({
-    currentTheme, onSetTheme, onClose, onClearLeaderboard, onFactoryReset
+    currentTheme, onSetTheme, currentDifficulty, onSetDifficulty, onClose, onClearLeaderboard, onFactoryReset
 }) => {
 
     const themes: { id: Theme, name: string, color: string }[] = [
@@ -29,7 +31,7 @@ export const SettingsMenu: React.FC<SettingsMenuProps> = ({
 
     return (
         <div className="absolute inset-0 z-50 bg-black/60 flex items-center justify-center p-6 backdrop-blur-sm">
-            <div className={`w-full max-w-md rounded-2xl p-6 shadow-2xl animate-in zoom-in-95 duration-200 bg-zinc-900 border border-zinc-800 text-white`}>
+            <div className={`w-full max-w-md rounded-2xl p-6 shadow-2xl animate-in zoom-in-95 duration-200 bg-zinc-900 border border-zinc-800 text-white max-h-[90vh] overflow-y-auto`}>
 
                 <div className="flex items-center justify-between mb-6">
                     <div className="flex items-center gap-3">
@@ -39,6 +41,33 @@ export const SettingsMenu: React.FC<SettingsMenuProps> = ({
                     <button onClick={onClose} className="p-2 hover:bg-white/10 rounded-full transition-colors">
                         <X className="w-5 h-5 opacity-70" />
                     </button>
+                </div>
+
+                {/* Difficulty */}
+                <div className="mb-8">
+                    <div className="flex items-center gap-2 mb-4">
+                        <Swords className="w-4 h-4 text-zinc-400" />
+                        <h3 className="text-sm font-medium text-zinc-400 uppercase tracking-wider">Difficulty</h3>
+                    </div>
+                    <div className="grid grid-cols-3 gap-2">
+                        {(['easy', 'medium', 'hard'] as Difficulty[]).map((d) => (
+                            <button
+                                key={d}
+                                onClick={() => onSetDifficulty(d)}
+                                className={`py-3 px-3 rounded-xl text-sm font-bold capitalize transition-all border ${currentDifficulty === d
+                                        ? 'bg-lime-500 text-black border-lime-500 shadow-lg shadow-lime-500/20'
+                                        : 'bg-zinc-950 text-zinc-400 border-zinc-800 hover:border-zinc-700'
+                                    }`}
+                            >
+                                {d}
+                            </button>
+                        ))}
+                    </div>
+                    <p className="text-xs text-zinc-500 mt-2 text-center">
+                        {currentDifficulty === 'easy' && "Forgiving (45° Tolerance)"}
+                        {currentDifficulty === 'medium' && "Balanced (30° Tolerance)"}
+                        {currentDifficulty === 'hard' && "Strict (15° Tolerance)"}
+                    </p>
                 </div>
 
                 {/* Themes */}
@@ -61,7 +90,7 @@ export const SettingsMenu: React.FC<SettingsMenuProps> = ({
                 </div>
 
                 {/* Data Management */}
-                <div>
+                <div className="mb-8">
                     <h3 className="text-sm font-medium text-zinc-400 mb-4 uppercase tracking-wider">Data Management</h3>
                     <div className="flex flex-col gap-3">
                         <button
@@ -86,6 +115,13 @@ export const SettingsMenu: React.FC<SettingsMenuProps> = ({
                             <span className="text-xs text-red-900/60 group-hover:text-red-500/60">Wipe All Data</span>
                         </button>
                     </div>
+                </div>
+
+                {/* Credits */}
+                <div className="text-center pt-4 border-t border-zinc-800/50">
+                    <p className="text-zinc-500 text-sm font-mono">
+                        Made with ☕ by <span className="text-lime-500 font-bold">Lenny Rajan</span>
+                    </p>
                 </div>
 
             </div>

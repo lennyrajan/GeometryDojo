@@ -1,16 +1,17 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { Level } from '../lib/shapes';
-import { Point, calculateScore } from '../lib/geometry';
+import { Point, calculateScore, Difficulty } from '../lib/geometry';
 import { RefreshCcw, ZoomIn, Check } from 'lucide-react';
 
 interface CanvasBoardProps {
     level: Level;
+    difficulty: Difficulty;
     onComplete: (score: number) => void;
     onNext?: () => void;
     bestScore?: number;
 }
 
-export const CanvasBoard: React.FC<CanvasBoardProps> = ({ level, onComplete, onNext }) => {
+export const CanvasBoard: React.FC<CanvasBoardProps> = ({ level, difficulty, onComplete, onNext }) => {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const [isDrawing, setIsDrawing] = useState(false);
     const [points, setPoints] = useState<Point[]>([]);
@@ -220,7 +221,7 @@ export const CanvasBoard: React.FC<CanvasBoardProps> = ({ level, onComplete, onN
             y: (p.y - offsetY) / size
         }));
 
-        const res = calculateScore(normalizedPoints, level.shape);
+        const res = calculateScore(normalizedPoints, level.shape, difficulty);
         setResult(res);
         onComplete(res.score);
 
