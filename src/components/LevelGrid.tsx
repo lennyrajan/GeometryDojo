@@ -1,6 +1,6 @@
 import React from 'react';
 import { Level } from '../lib/shapes';
-import { Trophy, Settings } from 'lucide-react';
+import { Trophy, Settings, Lock } from 'lucide-react';
 import levels from '../lib/shapes';
 
 interface LevelGridProps {
