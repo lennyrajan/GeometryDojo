@@ -471,7 +471,7 @@ const levels: Level[] = [
         shape: createParametric(
             (t) => Math.sin(t) * Math.pow(Math.sin(t / 2), 0.5),
             (t) => -Math.cos(t),
-            0.35, { x: 0.5, y: 0.6 }, 0, 4 * Math.PI
+            0.35, { x: 0.5, y: 0.6 }, 0, 2 * Math.PI
         ),
         unlockScore: 92.0
     },
