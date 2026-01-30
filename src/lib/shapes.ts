@@ -95,17 +95,6 @@ const infinityPoints = createParametric(
     100
 );
 
-// Crescent
-const createCrescent = (): Point[] => {
-    const points: Point[] = [];
-    const segments = 40;
-    // Outer arc
-    for (let i = 0; i <= segments; i++) {
-        const angle = -Math.PI / 2 + (i * 2 * Math.PI * 0.7) / segments; // part of circle
-        // Actually, let's just do manual carefully or subtractive circles.
-    }
-    return []; // Placeholder
-}
 
 // Improved Crescent manually
 const crescentPoints = (() => {
