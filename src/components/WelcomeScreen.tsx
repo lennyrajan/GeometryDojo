@@ -7,6 +7,9 @@ interface WelcomeScreenProps {
 }
 
 export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onComplete }) => {
+    const [name, setName] = useState('');
+    const [difficulty, setDifficulty] = useState<Difficulty>('medium');
+    const [error, setError] = useState('');
     const [showWelcome, setShowWelcome] = useState(false);
 
     const handleSubmit = (e: React.FormEvent) => {
