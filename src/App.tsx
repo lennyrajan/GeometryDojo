@@ -7,7 +7,7 @@ import { WelcomeScreen } from './components/WelcomeScreen';
 import { SettingsMenu } from './components/SettingsMenu';
 import { Level } from './lib/shapes';
 import levels from './lib/shapes';
-import { ArrowLeft, RefreshCcw } from 'lucide-react';
+import { ArrowLeft, RefreshCcw, AlignJustify } from 'lucide-react';
 
 function App() {
 
@@ -17,12 +17,15 @@ function App() {
         submitScore,
         playerName,
         setPlayerName,
-        theme,
-        setTheme,
         difficulty,
         setDifficulty,
         clearLeaderboard,
-        factoryReset
+        factoryReset,
+        allPlayers,
+        addPlayer,
+        switchPlayer,
+        activePlayer,
+        deletePlayer
     } = useGameStore();
 
 
@@ -53,7 +56,7 @@ function App() {
         }
     };
 
-    // 1. Welcome Screen Check
+    // 1. Welcome Screen Check (Only if NO name set ever)
     if (!playerName) {
         return <WelcomeScreen onComplete={(name, diff) => {
             setPlayerName(name);
@@ -68,17 +71,17 @@ function App() {
                 scores={scores}
                 playerName={playerName}
                 onBack={() => setViewingLeaderboard(false)}
+                currentDifficulty={difficulty}
+                onSetDifficulty={setDifficulty}
             />
         );
     }
 
     return (
-        <div className={`w-full h-screen bg-background text-foreground overflow-hidden flex flex-col transition-colors duration-500 theme-${theme}`}>
+        <div className={`w-full h-screen bg-zinc-950 text-white overflow-hidden flex flex-col transition-colors duration-500`}>
             {/* Settings Modal */}
             {showingSettings && (
                 <SettingsMenu
-                    currentTheme={theme}
-                    onSetTheme={setTheme}
                     currentDifficulty={difficulty}
                     onSetDifficulty={setDifficulty}
                     onClose={() => setShowingSettings(false)}
@@ -90,37 +93,55 @@ function App() {
                         factoryReset();
                         setShowingSettings(false);
                     }}
+                    players={allPlayers}
+                    activePlayerId={activePlayer.id}
+                    onAddPlayer={addPlayer}
+                    onSwitchPlayer={switchPlayer}
+                    onDeletePlayer={deletePlayer}
                 />
             )}
 
-            {/* Game Header */}
+            {/* Consolidated Game Header (Only in Level) */}
             {currentLevel && (
-                <div className="absolute top-0 left-0 right-0 z-40 p-4 flex justify-between items-center pointer-events-none">
-                    <button
-                        onClick={() => setCurrentLevel(null)}
-                        className="pointer-events-auto p-2 bg-black/50 backdrop-blur rounded-full text-white hover:bg-white/10 transition-colors"
-                    >
-                        <ArrowLeft className="w-6 h-6" />
-                    </button>
-                    <button
-                        onClick={() => setResetKey(k => k + 1)}
-                        className="pointer-events-auto p-2 bg-black/50 backdrop-blur rounded-full text-white hover:bg-white/10 transition-colors ml-2"
-                        title="Restart Level"
-                    >
-                        <RefreshCcw className="w-6 h-6" />
-                    </button>
+                <div className="absolute top-0 left-0 right-0 z-40 p-4 flex items-center justify-between pointer-events-none">
 
-                    <div className="pointer-events-auto px-4 py-2 bg-black/30 backdrop-blur rounded-full">
-                        <span className="text-white font-bold text-sm tracking-widest uppercase opacity-80">
-                            {currentLevel.name}
-                        </span>
+                    <div className="pointer-events-auto flex items-center gap-2">
+                        <button
+                            onClick={() => setCurrentLevel(null)}
+                            className="p-2 bg-black/40 backdrop-blur rounded-full text-white hover:bg-white/10 transition-colors border border-white/5"
+                        >
+                            <ArrowLeft className="w-5 h-5" />
+                        </button>
                     </div>
 
-                    <div className="pointer-events-auto flex items-center gap-2 bg-black/50 backdrop-blur px-4 py-2 rounded-full border border-white/10">
-                        <span className="text-zinc-400 text-xs uppercase tracking-wider">Best:</span>
-                        <span className="text-white font-mono font-bold">
-                            {scores[currentLevel.id]?.toFixed(1) || "0.0"}%
+                    <div className="pointer-events-auto flex items-center gap-3 bg-black/40 backdrop-blur px-4 py-2 rounded-full border border-white/5 shadow-lg">
+                        <span className="text-white font-bold text-sm tracking-widest uppercase">
+                            {currentLevel.name}
                         </span>
+                        <div className="w-1 h-3 bg-white/20 rounded-full"></div>
+                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded uppercase ${difficulty === 'easy' ? 'bg-green-500/20 text-green-400' :
+                            difficulty === 'medium' ? 'bg-yellow-500/20 text-yellow-400' :
+                                'bg-red-500/20 text-red-400'
+                            }`}>
+                            {difficulty}
+                        </span>
+                        <div className="w-1 h-3 bg-white/20 rounded-full"></div>
+                        <div className="flex items-center gap-2">
+                            <span className="text-zinc-400 text-xs uppercase tracking-wider">Best:</span>
+                            <span className="text-white font-mono font-bold">
+                                {scores[currentLevel.id]?.toFixed(1) || "0.0"}%
+                            </span>
+                        </div>
+                    </div>
+
+                    <div className="pointer-events-auto">
+                        <button
+                            onClick={() => setResetKey(k => k + 1)}
+                            className="p-2 bg-black/40 backdrop-blur rounded-full text-white hover:bg-white/10 transition-colors border border-white/5"
+                            title="Restart Level"
+                        >
+                            <RefreshCcw className="w-5 h-5" />
+                        </button>
                     </div>
                 </div>
             )}
@@ -140,7 +161,7 @@ function App() {
                     unlockedLevels={unlockedLevels}
                     scores={scores}
                     onSelectLevel={handleLevelSelect}
-                    onReset={() => setShowingSettings(true)} // Re-purposed "Reset" button to open Settings for now, or we update LevelGrid prop name
+                    onReset={() => setShowingSettings(true)}
                     onViewLeaderboard={() => setViewingLeaderboard(true)}
                 />
             )}

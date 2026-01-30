@@ -1,19 +1,22 @@
 import React from 'react';
-import { ArrowLeft, Globe, User } from 'lucide-react';
+import { ArrowLeft, Globe, User, Swords } from 'lucide-react';
+import { Difficulty } from '../types';
 
 interface LeaderboardProps {
     scores: Record<number, number>;
     playerName: string | null;
     onBack: () => void;
+    currentDifficulty: Difficulty;
+    onSetDifficulty: (diff: Difficulty) => void;
 }
 
-export const Leaderboard: React.FC<LeaderboardProps> = ({ scores, playerName, onBack }) => {
+export const Leaderboard: React.FC<LeaderboardProps> = ({ scores, playerName, onBack, currentDifficulty, onSetDifficulty }) => {
     // Calculate User Stats
     const totalScore = Object.values(scores).reduce((a, b) => a + b, 0);
     const completedLevels = Object.keys(scores).length;
     const average = completedLevels > 0 ? totalScore / completedLevels : 0;
 
-    // Mock Global Data
+    // Mock Global Data (Could vary based on difficulty)
     const globalRankings = [
         { name: "GeometryGod", score: 99.8, rank: 1 },
         { name: "ShapeShifter", score: 99.5, rank: 2 },
@@ -26,33 +29,54 @@ export const Leaderboard: React.FC<LeaderboardProps> = ({ scores, playerName, on
     ];
 
     return (
-        <div className="flex flex-col h-full overflow-hidden">
+        <div className="flex flex-col h-full overflow-hidden bg-zinc-950 text-white">
             {/* Header */}
             <div className="flex items-center gap-4 p-6 pb-2 shrink-0">
                 <button
                     onClick={onBack}
-                    className="p-2 bg-zinc-900/50 rounded-full hover:bg-zinc-800 transition-colors"
+                    className="p-2 bg-zinc-900/50 rounded-full hover:bg-zinc-800 transition-colors border border-zinc-800"
                 >
                     <ArrowLeft className="w-5 h-5 text-zinc-400" />
                 </button>
-                <h1 className="text-2xl font-bold text-white">Global Rankings</h1>
+                <h1 className="text-2xl font-bold">Leaderboard</h1>
             </div>
 
-            <div className="flex-1 overflow-y-auto p-6 pt-2">
+            {/* Difficulty Tabs */}
+            <div className="px-6 py-4">
+                <div className="flex p-1 bg-zinc-900 rounded-xl border border-zinc-800">
+                    {(['easy', 'medium', 'hard'] as Difficulty[]).map(d => (
+                        <button
+                            key={d}
+                            onClick={() => onSetDifficulty(d)}
+                            className={`flex-1 py-2 text-xs font-bold uppercase tracking-wider rounded-lg transition-all ${currentDifficulty === d
+                                    ? 'bg-white text-black shadow'
+                                    : 'text-zinc-500 hover:text-zinc-300'
+                                }`}
+                        >
+                            {d}
+                        </button>
+                    ))}
+                </div>
+            </div>
+
+            <div className="flex-1 overflow-y-auto px-6 pb-6 custom-scrollbar">
                 {/* User Stats Card */}
-                <div className="bg-gradient-to-br from-zinc-900 to-zinc-950 rounded-2xl p-6 mb-8 border border-zinc-800 shrink-0">
+                <div className={`rounded-2xl p-6 mb-8 border transition-colors ${currentDifficulty === 'easy' ? 'bg-green-900/10 border-green-500/20' :
+                        currentDifficulty === 'medium' ? 'bg-yellow-900/10 border-yellow-500/20' :
+                            'bg-red-900/10 border-red-500/20'
+                    } shrink-0`}>
                     <div className="flex items-center gap-3 mb-4">
-                        <User className="w-5 h-5 text-green-500" />
-                        <span className="font-mono text-sm text-zinc-400">YOUR STATISTICS</span>
+                        <User className="w-5 h-5 opacity-70" />
+                        <span className="font-mono text-sm opacity-70">YOUR STATS ({currentDifficulty.toUpperCase()})</span>
                     </div>
                     <div className="grid grid-cols-2 gap-4">
                         <div>
-                            <div className="text-zinc-500 text-xs uppercase tracking-wider mb-1">Total Avg</div>
-                            <div className="text-3xl font-black text-white">{average.toFixed(1)}%</div>
+                            <div className="text-xs uppercase tracking-wider mb-1 opacity-50">Total Avg</div>
+                            <div className="text-3xl font-black">{average.toFixed(1)}%</div>
                         </div>
                         <div>
-                            <div className="text-zinc-500 text-xs uppercase tracking-wider mb-1">Levels</div>
-                            <div className="text-3xl font-black text-white">{completedLevels}</div>
+                            <div className="text-xs uppercase tracking-wider mb-1 opacity-50">Levels</div>
+                            <div className="text-3xl font-black">{completedLevels}</div>
                         </div>
                     </div>
                 </div>
@@ -60,23 +84,23 @@ export const Leaderboard: React.FC<LeaderboardProps> = ({ scores, playerName, on
                 {/* Global List */}
                 <div className="flex items-center gap-2 mb-4">
                     <Globe className="w-4 h-4 text-purple-500" />
-                    <span className="text-xs font-bold text-zinc-500 uppercase tracking-widest">Top Players</span>
+                    <span className="text-xs font-bold text-zinc-500 uppercase tracking-widest">Top Players ({currentDifficulty})</span>
                 </div>
 
                 <div className="space-y-3 pb-safe">
                     {/* Your Entry (Pinned if high enough, or inserted) */}
                     {completedLevels > 0 && (
-                        <div className="flex items-center justify-between p-4 bg-lime-900/10 rounded-xl border border-lime-500/30 mb-4 sticky top-0 backdrop-blur-md z-10 shadow-lg">
+                        <div className="flex items-center justify-between p-4 bg-white/5 rounded-xl border border-white/10 mb-4 sticky top-0 backdrop-blur-md z-10 shadow-lg">
                             <div className="flex items-center gap-4">
-                                <span className="w-8 h-8 flex items-center justify-center rounded-full font-bold text-sm bg-lime-500 text-black">
+                                <span className="w-8 h-8 flex items-center justify-center rounded-full font-bold text-sm bg-white text-black">
                                     ?
                                 </span>
                                 <div>
-                                    <span className="font-bold text-white block">{playerName || "You"}</span>
-                                    <span className="text-xs text-lime-400">Current Player</span>
+                                    <span className="font-bold block">{playerName || "You"}</span>
+                                    <span className="text-xs opacity-50">Current Player</span>
                                 </div>
                             </div>
-                            <div className="font-mono font-bold text-lime-400 text-xl">{average.toFixed(1)}%</div>
+                            <div className="font-mono font-bold text-xl">{average.toFixed(1)}%</div>
                         </div>
                     )}
 
