@@ -117,7 +117,7 @@ const levels: Level[] = [
             return points;
         })(),
         unlockScore: 99.5
-    }
+    },
     {
         id: 11,
         name: "The Diamond",
