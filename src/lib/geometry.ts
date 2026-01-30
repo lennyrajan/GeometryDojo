@@ -167,8 +167,8 @@ const scoreAlignment = (
 
     // Scoring Formula
     const avgDist = totalDist / count;
-    // Apply spatial multiplier to distance penalties
-    const totalPenalty = ((avgDist * 300) + (maxDist * 50)) * spatialPenaltyMultiplier + (maxAngleDiff * maxAngleWeight) + (avgAngleDiff * avgAngleWeight);
+    // Lowered base weights from 300/50 to 200/40 to be more forgiving of slight spatial jitter
+    const totalPenalty = ((avgDist * 200) + (maxDist * 40)) * spatialPenaltyMultiplier + (maxAngleDiff * maxAngleWeight) + (avgAngleDiff * avgAngleWeight);
     const score = Math.max(0, 100 - totalPenalty);
 
     return { score, diffs };
@@ -203,22 +203,22 @@ export const calculateScore = (
 
     switch (difficulty) {
         case 'easy':
-            angleTolerance = 30; // Very forgiving
-            maxAngleWeight = 0.8;
-            avgAngleWeight = 0.1;
-            spatialPenaltyMultiplier = 0.8;
+            angleTolerance = 45; // Increased from 30
+            maxAngleWeight = 0.4; // Decreased from 0.8
+            avgAngleWeight = 0.05; // Decreased from 0.1
+            spatialPenaltyMultiplier = 0.4; // Decreased from 0.8
             break;
         case 'medium':
-            angleTolerance = 20; // Relaxed for better "human" feel on curves
-            maxAngleWeight = 1.0;
-            avgAngleWeight = 0.2;
-            spatialPenaltyMultiplier = 1.0;
+            angleTolerance = 30; // Increased from 20
+            maxAngleWeight = 0.6; // Decreased from 1.0
+            avgAngleWeight = 0.1; // Decreased from 0.2
+            spatialPenaltyMultiplier = 0.7; // Decreased from 1.0
             break;
         case 'hard':
-            angleTolerance = 10; // Very Strict
-            maxAngleWeight = 2.0;
-            avgAngleWeight = 0.5;
-            spatialPenaltyMultiplier = 3.0; // Heavily penalize any spatial deviation (e.g. curves on straight lines)
+            angleTolerance = 15; // Increased from 10
+            maxAngleWeight = 1.0; // Decreased from 2.0
+            avgAngleWeight = 0.3; // Decreased from 0.5
+            spatialPenaltyMultiplier = 1.5; // Decreased from 3.0
             break;
     }
 
