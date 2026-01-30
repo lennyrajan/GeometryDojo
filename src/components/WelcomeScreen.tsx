@@ -31,11 +31,11 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onComplete }) => {
             <div className="absolute inset-0 z-50 bg-indigo-950 flex flex-col items-center justify-center overflow-hidden">
                 <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-indigo-900/50 via-indigo-950 to-black animate-pulse" />
 
-                <div className="relative z-10 flex flex-col items-center justify-center animate-out fade-out zoom-out-150 duration-1500 fill-mode-forwards">
-                    <h2 className="text-2xl text-indigo-300 font-medium tracking-widest uppercase mb-4 animate-in fade-in slide-in-from-bottom-4 duration-700">
+                <div className="relative z-10 flex flex-col items-center justify-center animate-fly-through">
+                    <h2 className="text-2xl text-indigo-300 font-medium tracking-widest uppercase mb-4">
                         Welcome
                     </h2>
-                    <h1 className="text-6xl md:text-8xl font-black text-white tracking-tighter uppercase animate-in zoom-in-50 fade-in duration-1000 ease-out">
+                    <h1 className="text-6xl md:text-8xl font-black text-white tracking-tighter uppercase">
                         {name}
                     </h1>
                 </div>
