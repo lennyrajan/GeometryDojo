@@ -169,7 +169,6 @@ function App() {
                     onSelectLevel={handleLevelSelect}
                     onViewLeaderboard={() => setViewingLeaderboard(true)}
                     onOpenSettings={() => setShowingSettings(true)}
-                    activeDifficulty={difficulty}
                     theme={theme}
                 />
             )}

@@ -10,11 +10,10 @@ interface LevelGridProps {
     onSelectLevel: (level: Level) => void;
     onViewLeaderboard: () => void;
     onOpenSettings: () => void;
-    activeDifficulty: Difficulty;
     theme: 'space' | 'classic';
 }
 
-export const LevelGrid: React.FC<LevelGridProps> = ({ unlockedLevels, scores, onSelectLevel, onViewLeaderboard, onOpenSettings, activeDifficulty, theme }) => {
+export const LevelGrid: React.FC<LevelGridProps> = ({ unlockedLevels, scores, onSelectLevel, onViewLeaderboard, onOpenSettings, theme }) => {
     return (
         <div className="p-4 h-full flex flex-col">
             <div className="flex justify-between items-start mb-4">
