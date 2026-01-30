@@ -253,7 +253,7 @@ export const CanvasBoard: React.FC<CanvasBoardProps> = ({ level, difficulty, onC
 
 
     return (
-        <div className="relative w-full h-full flex flex-col items-center justify-center bg-background">
+        <div className="relative w-full h-full flex flex-col items-center justify-center">
             <canvas
                 ref={canvasRef}
                 className="w-full h-full touch-none cursor-crosshair"
