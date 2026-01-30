@@ -289,7 +289,102 @@ const levels: Level[] = [
         name: "The Capsule",
         description: "Smooth ends.",
         fact: "A geometric shape consisting of a cylinder with hemispherical ends. Also known as a stadium of revolution.",
-        shape: createEllipse(0.15, 0.3), // Simplified to vertical ellipse logic for now or custom logic if we fixed it
+        shape: (() => {
+            const points: Point[] = [];
+            const r = 0.15;
+            const cx = 0.5;
+            const topCy = 0.35;
+            const botCy = 0.65;
+            const segments = 30;
+
+            // 1. Right Line (Top to Bottom)
+            // (0.65, 0.35) to (0.65, 0.65)
+            // Actually, let's trace arcs and fill lines implicitly or explicitly?
+            // Explicit is better for sampling.
+
+            // Start at Top-Right
+            // 1. Arc Top (Right half? No, full Top Semicircle)
+            // Let's go Clockwise or CCW? Standard is usually CCW for math, but UI drawing often CW?
+            // Let's do CCW starting from Right side.
+
+            // Part 1: Right Line (Down? No, CCW is Up on Right side).
+            // Let's go CCW.
+            // Start Bottom-Right (0.65, 0.65).
+            // Go Up to Top-Right (0.65, 0.35).
+            points.push({ x: cx + r, y: botCy });
+            points.push({ x: cx + r, y: topCy });
+
+            // Part 2: Top Semicircle (CCW)
+            // Center (0.5, 0.35). Angle 0 to PI.
+            for (let i = 0; i <= segments; i++) {
+                const ang = 0 + (Math.PI - 0) * (i / segments);
+                // Wait, 0 is Right. PI is Left.
+                // But we are at Top.
+                // Math.cos(0) = 1 (Right). 
+                // So angle 0 corresponds to (0.65, 0.35). Correct.
+                // Angle PI corresponds to (0.35, 0.35). Correct.
+                // We want the arc to go UP. sin(ang) > 0? No, y is inverted in screen coords?
+                // Screen coords: Y increases DOWN.
+                // So sin(0..PI) is Positive (Down).
+                // We want the Top arc (y < 0.35).
+                // So we need sin to be negative relative to center.
+                // So angle range: -PI? No.
+                // Center y=0.35. Top is 0.2.
+                // We need y = 0.35 + r*sin(theta).
+                // If theta=0..PI, sin is 0..1..0. y = 0.35..0.5..0.35. That's expanding DOWN.
+                // We want expanding UP (Y < 0.35).
+                // So typical math angle wrapping.
+                // We need range that gives negative sin.
+                // PI to 2PI (or -PI to 0).
+                // Left is PI. Right is 2PI (0).
+                // We are at Right (0). We want to go to Left (PI) via Top.
+                // So we go 2PI -> PI? No, 0 -> -PI.
+                // Or: Y = cy - r*sin(ang)? No, keep math standard.
+                // Standard: 0 (Right), -PI/2 (Up/Top), -PI (Left).
+                // So range: 0 down to -PI.
+                const ang = 0 + (-Math.PI - 0) * (i / segments);
+                points.push({
+                    x: cx + r * Math.cos(ang),
+                    y: topCy + r * Math.sin(ang)
+                });
+            }
+
+            // Part 3: Left Line (Down)
+            // Current point is (0.35, 0.35).
+            // Go to (0.35, 0.65).
+            points.push({ x: cx - r, y: botCy });
+
+            // Part 4: Bottom Semicircle (CCW)
+            // Center (0.5, 0.65).
+            // We are at Left (PI). We want to go to Right (0/2PI) via Bottom.
+            // Bottom means Y > 0.65.
+            // sin must be positive.
+            // range PI to 2PI? No. PI is Left. 0 is Right.
+            // PI -> 0? sin(PI..0) is 0..1..0? No.
+            // Quadrants:
+            // 0..PI/2 (DownRight).
+            // PI/2..PI (DownLeft).
+            // We start at Left (PI). We need to go Down and Right.
+            // So PI -> 2PI?
+            // sin(PI) = 0. sin(3PI/2) = -1. Y increases?
+            // Math.sin(3PI/2) = -1. y = cy - r = Up.
+            // We want y = cy + r = Down.
+            // So sin positive.
+            // sin is positive in 0..PI.
+            // But 0 is Right. PI is Left.
+            // So we go PI -> 0.
+            // sin(PI) = 0. sin(PI/2) = 1 (Down). sin(0) = 0.
+            // So path PI -> 0 creates the Bottom arc.
+            for (let i = 0; i <= segments; i++) {
+                const ang = Math.PI + (0 - Math.PI) * (i / segments);
+                points.push({
+                    x: cx + r * Math.cos(ang),
+                    y: botCy + r * Math.sin(ang)
+                });
+            }
+
+            return points;
+        })(),
         unlockScore: 92.0
     },
     {
