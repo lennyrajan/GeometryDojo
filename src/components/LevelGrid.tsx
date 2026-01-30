@@ -43,7 +43,7 @@ export const LevelGrid: React.FC<LevelGridProps> = ({ unlockedLevels, scores, on
                 <div className="flex flex-col">
                     <h1 className="text-xl font-bold text-white mb-1 flex items-center gap-2">
                         Geometry Dojo
-                        <span className={`text-[8px] uppercase font-bold px-1.5 py-0.5 rounded border border-white/10 ${activeDifficulty === 'easy' ? 'bg-green-500/20 text-green-400' :
+                        <span className={`text-[8px] uppercase font-bold px-1.5 py-[1px] leading-none rounded border border-white/10 ${activeDifficulty === 'easy' ? 'bg-green-500/20 text-green-400' :
                             activeDifficulty === 'medium' ? 'bg-yellow-500/20 text-yellow-400' :
                                 'bg-red-500/20 text-red-400'
                             }`}>
