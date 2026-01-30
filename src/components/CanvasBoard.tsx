@@ -64,14 +64,20 @@ export const CanvasBoard: React.FC<CanvasBoardProps> = ({ level, onComplete, onN
 
         const w = canvas.width;
         const h = canvas.height;
+        const size = Math.min(w, h);
+        const offsetX = (w - size) / 2;
+        const offsetY = (h - size) / 2;
 
         // Apply Transform
         ctx.save();
         ctx.translate(transform.x, transform.y);
         ctx.scale(transform.k, transform.k);
 
-        // Helper to map normalized point to canvas
-        const toCanvas = (p: Point) => ({ x: p.x * w, y: p.y * h });
+        // Helper to map normalized point to canvas (Aspect Correct)
+        const toCanvas = (p: Point) => ({
+            x: p.x * size + offsetX,
+            y: p.y * size + offsetY
+        });
 
         // Draw Target Shape (Faint Guide)
         if (showTarget || result) {
@@ -87,12 +93,6 @@ export const CanvasBoard: React.FC<CanvasBoardProps> = ({ level, onComplete, onN
                 for (let i = 1; i < targetPoints.length; i++) {
                     ctx.lineTo(targetPoints[i].x, targetPoints[i].y);
                 }
-                if (level.shape.length > 2) { // Auto-close visual if it's a polygon
-                    // check if last point is same as first? 
-                    // Our shapes defined in levels usually close themselves or we should close them
-                    // level.shape for polygons usually has first == last or we just iterate
-                    // The definitions uses createPoly which loops <= sides so it closes.
-                }
             }
             ctx.stroke();
         }
@@ -104,6 +104,23 @@ export const CanvasBoard: React.FC<CanvasBoardProps> = ({ level, onComplete, onN
             ctx.lineWidth = 4;
             ctx.lineCap = 'round';
             ctx.lineJoin = 'round';
+            // Points are already stored as raw canvas coords, so draw directly?
+            // Wait, points are raw canvas coords (pixels).
+            // We need to ensure they align visually with the transformed view?
+            // No, user draws in raw pixels. Transform applies to the VIEW of the canvas if we used ctx.scale on the whole thing.
+            // But here we apply ctx.translate/scale Manually for the ZOOM feature?
+            // Yes, transform applies to everything inside ctx.save().
+            // So if user draws, points are raw pixels. 
+            // If we are zoomed in, we need to transform the points to match the zoom?
+            // Or does the user draw continuously in "screen space"?
+            // Usually user draws in screen space. The canvas is just a buffer.
+
+            // Current implementation stores points in raw pixel coords (getPoint).
+            // But we apply ctx.transform before drawing user path.
+            // This means if we pan/zoom, the user's existing drawing moves.
+            // That is correct for Review mode.
+            // But during drawing, isZooming is false/transform is identity.
+
             ctx.moveTo(points[0].x, points[0].y);
             for (let i = 1; i < points.length; i++) {
                 ctx.lineTo(points[i].x, points[i].y);
@@ -114,17 +131,12 @@ export const CanvasBoard: React.FC<CanvasBoardProps> = ({ level, onComplete, onN
         // Draw Result (Heatmap)
         if (result) {
             const { alignedUserPath, diffs } = result;
-            // We need to map the aligned path (which is normalized 0-1) to canvas
             const alignedCanvas = alignedUserPath.map(toCanvas);
 
-            // Draw segment by segment with color based on diff
             for (let i = 0; i < alignedCanvas.length - 1; i++) {
                 ctx.beginPath();
                 const diff = diffs[i];
-                // Green (low diff) -> Red (high diff)
-                // Diff 0 -> 120 (Green)
-                // Diff 0.05 -> 0 (Red)
-                const goodness = Math.max(0, 1 - (diff * 20)); // Amplified diff for color
+                const goodness = Math.max(0, 1 - (diff * 20));
                 const hue = goodness * 120;
 
                 ctx.strokeStyle = `hsl(${hue}, 100%, 50%)`;
@@ -134,6 +146,8 @@ export const CanvasBoard: React.FC<CanvasBoardProps> = ({ level, onComplete, onN
                 ctx.stroke();
             }
         }
+
+        ctx.restore();
     };
 
     useEffect(() => {
@@ -147,7 +161,7 @@ export const CanvasBoard: React.FC<CanvasBoardProps> = ({ level, onComplete, onN
         const clientX = 'touches' in e ? e.touches[0].clientX : (e as React.MouseEvent).clientX;
         const clientY = 'touches' in e ? e.touches[0].clientY : (e as React.MouseEvent).clientY;
 
-        // allow drawing outside canvas bounds? no, clamp or just record
+        // Return raw pixel coordinates relative to canvas
         return {
             x: clientX - rect.left,
             y: clientY - rect.top
@@ -156,11 +170,8 @@ export const CanvasBoard: React.FC<CanvasBoardProps> = ({ level, onComplete, onN
 
     const startDrawing = (e: React.PointerEvent) => {
         if (result) {
-            // Zoom/Pan Logic
             if (isZooming) {
                 e.currentTarget.setPointerCapture(e.pointerId);
-                // Initialize drag/pinch?
-                // Simple Panning:
                 lastCenter.current = { x: e.clientX, y: e.clientY };
             }
             return;
@@ -192,16 +203,21 @@ export const CanvasBoard: React.FC<CanvasBoardProps> = ({ level, onComplete, onN
         if (!isDrawing) return;
         setIsDrawing(false);
 
-        // Process core
-        if (points.length < 5) return; // Too short
+        if (points.length < 5) return;
 
-        // Normalize user points to 0-1 for scoring
         const canvas = canvasRef.current;
         if (!canvas) return;
 
+        // Normalize using the SAME aspect-correct logic as the visual guide
+        const w = canvas.width;
+        const h = canvas.height;
+        const size = Math.min(w, h);
+        const offsetX = (w - size) / 2;
+        const offsetY = (h - size) / 2;
+
         const normalizedPoints = points.map(p => ({
-            x: p.x / canvas.width,
-            y: p.y / canvas.height
+            x: (p.x - offsetX) / size,
+            y: (p.y - offsetY) / size
         }));
 
         const res = calculateScore(normalizedPoints, level.shape);
