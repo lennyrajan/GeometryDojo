@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Difficulty, Theme } from '../types';
+import { Difficulty } from '../types';
 
 const STORAGE_KEY = 'geometry-dojo-v1';
 

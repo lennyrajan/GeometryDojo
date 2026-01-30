@@ -7,7 +7,7 @@ import { WelcomeScreen } from './components/WelcomeScreen';
 import { SettingsMenu } from './components/SettingsMenu';
 import { Level } from './lib/shapes';
 import levels from './lib/shapes';
-import { ArrowLeft, RefreshCcw, AlignJustify } from 'lucide-react';
+import { ArrowLeft, RefreshCcw } from 'lucide-react';
 
 function App() {
 

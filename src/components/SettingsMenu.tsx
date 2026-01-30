@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Settings, X, Trash2, Monitor, Swords, User, Plus, Check, LogOut } from 'lucide-react';
+import { Settings, X, Trash2, Monitor, Swords, User, Plus, Check } from 'lucide-react';
 import { Difficulty } from '../types';
 import { PlayerProfile } from '../hooks/useGameStore';
 
