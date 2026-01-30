@@ -164,16 +164,58 @@ export const calculateScore = (userPath: Point[], targetPath: Point[]): { score:
     const avgDist = minTotalDist / count;
 
     // Penalize systematic errors (like max deviation).
-    // If user draws a circle over a hexagon, the MAX pairwise distance will be high at the vertices.
     const maxDist = Math.max(...diffs);
 
-    // Scoring formula:
-    // Base penalty: Average Distance * Weight
-    // Plus: Max Distance * Weight
-    // Prioritize uniformity.
+    // 4. Corner Detection Strategy
+    const getAngle = (p1: Point, p2: Point, p3: Point) => {
+        const v1 = { x: p1.x - p2.x, y: p1.y - p2.y };
+        const v2 = { x: p3.x - p2.x, y: p3.y - p2.y };
+        const dot = v1.x * v2.x + v1.y * v2.y;
+        const mag1 = Math.sqrt(v1.x * v1.x + v1.y * v1.y);
+        const mag2 = Math.sqrt(v2.x * v2.x + v2.y * v2.y);
+        if (mag1 === 0 || mag2 === 0) return 180;
+        const angleRad = Math.acos(Math.max(-1, Math.min(1, dot / (mag1 * mag2))));
+        return (angleRad * 180) / Math.PI;
+    };
 
-    const penalty = (avgDist * 300) + (maxDist * 100);
-    const score = Math.max(0, 100 - penalty);
+    let cornerPenalty = 0;
+
+    // Look for corners in the Target Path (which is shifted by bestShift)
+    for (let i = 0; i < count; i++) {
+        // Indices for Target (using bestShift)
+        const tIdxPrev = (i + bestShift - 5 + count) % count;
+        const tIdxCurr = (i + bestShift) % count;
+        const tIdxNext = (i + bestShift + 5) % count;
+
+        const targetAngle = getAngle(targetResampled[tIdxPrev], targetResampled[tIdxCurr], targetResampled[tIdxNext]);
+
+        // If Target has a corner here (e.g. < 160 degrees)
+        // Note: Circle is approx 174 degrees with 100 points. Octagon vertex is 135 deg.
+        if (targetAngle < 160) {
+            // Check User at matching index 'i'
+            const uIdxPrev = (i - 5 + count) % count;
+            const uIdxCurr = i;
+            const uIdxNext = (i + 5) % count;
+
+            const userAngle = getAngle(bestUserPath[uIdxPrev], bestUserPath[uIdxCurr], bestUserPath[uIdxNext]);
+
+            // If User is too smooth (e.g. > 170) or too sharp (unlikely), penalize difference.
+            // We care about "Missing the Corner" => User is flat (180) vs Target (135).
+            const diff = Math.abs(userAngle - targetAngle);
+
+            // Weight the corner penalty heavily
+            cornerPenalty += diff * 0.5;
+        }
+    }
+
+    // Scoring formula:
+    // Base penalty: Average Distance
+    // Max penalty: Max Distance
+    // Corner penalty: Missing geometric features
+
+    // Reduced MaxDist weight slightly since CornerPenalty will handle the "shape" errors.
+    const totalPenalty = (avgDist * 300) + (maxDist * 50) + cornerPenalty;
+    const score = Math.max(0, 100 - totalPenalty);
 
     return { score, diffs, alignedUserPath: bestUserPath };
 };
