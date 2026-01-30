@@ -68,11 +68,10 @@ function App() {
     if (viewingLeaderboard) {
         return (
             <Leaderboard
-                scores={scores}
+                allScores={activePlayer.scores}
                 playerName={playerName}
                 onBack={() => setViewingLeaderboard(false)}
-                currentDifficulty={difficulty}
-                onSetDifficulty={setDifficulty}
+                initialDifficulty={difficulty}
             />
         );
     }

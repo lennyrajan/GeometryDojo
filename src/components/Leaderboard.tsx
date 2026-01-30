@@ -1,16 +1,24 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { ArrowLeft, Globe, User } from 'lucide-react';
 import { Difficulty } from '../types';
 
 interface LeaderboardProps {
-    scores: Record<number, number>;
+    allScores: {
+        easy: Record<number, number>;
+        medium: Record<number, number>;
+        hard: Record<number, number>;
+    };
     playerName: string | null;
     onBack: () => void;
-    currentDifficulty: Difficulty;
-    onSetDifficulty: (diff: Difficulty) => void;
+    initialDifficulty: Difficulty;
 }
 
-export const Leaderboard: React.FC<LeaderboardProps> = ({ scores, playerName, onBack, currentDifficulty, onSetDifficulty }) => {
+export const Leaderboard: React.FC<LeaderboardProps> = ({ allScores, playerName, onBack, initialDifficulty }) => {
+    // Local state for viewing, disjoint from global game difficulty
+    const [viewDifficulty, setViewDifficulty] = useState<Difficulty>(initialDifficulty);
+
+    const scores = allScores[viewDifficulty];
+
     // Calculate User Stats
     const totalScore = Object.values(scores).reduce((a, b) => a + b, 0);
     const completedLevels = Object.keys(scores).length;
@@ -47,8 +55,8 @@ export const Leaderboard: React.FC<LeaderboardProps> = ({ scores, playerName, on
                     {(['easy', 'medium', 'hard'] as Difficulty[]).map(d => (
                         <button
                             key={d}
-                            onClick={() => onSetDifficulty(d)}
-                            className={`flex-1 py-2 text-xs font-bold uppercase tracking-wider rounded-lg transition-all ${currentDifficulty === d
+                            onClick={() => setViewDifficulty(d)}
+                            className={`flex-1 py-2 text-xs font-bold uppercase tracking-wider rounded-lg transition-all ${viewDifficulty === d
                                 ? 'bg-white text-black shadow'
                                 : 'text-zinc-500 hover:text-zinc-300'
                                 }`}
@@ -61,13 +69,13 @@ export const Leaderboard: React.FC<LeaderboardProps> = ({ scores, playerName, on
 
             <div className="flex-1 overflow-y-auto px-6 pb-6 custom-scrollbar">
                 {/* User Stats Card */}
-                <div className={`rounded-2xl p-6 mb-8 border transition-colors ${currentDifficulty === 'easy' ? 'bg-green-900/10 border-green-500/20' :
-                    currentDifficulty === 'medium' ? 'bg-yellow-900/10 border-yellow-500/20' :
+                <div className={`rounded-2xl p-6 mb-8 border transition-colors ${viewDifficulty === 'easy' ? 'bg-green-900/10 border-green-500/20' :
+                    viewDifficulty === 'medium' ? 'bg-yellow-900/10 border-yellow-500/20' :
                         'bg-red-900/10 border-red-500/20'
                     } shrink-0`}>
                     <div className="flex items-center gap-3 mb-4">
                         <User className="w-5 h-5 opacity-70" />
-                        <span className="font-mono text-sm opacity-70">YOUR STATS ({currentDifficulty.toUpperCase()})</span>
+                        <span className="font-mono text-sm opacity-70">YOUR STATS ({viewDifficulty.toUpperCase()})</span>
                     </div>
                     <div className="grid grid-cols-2 gap-4">
                         <div>
@@ -84,7 +92,7 @@ export const Leaderboard: React.FC<LeaderboardProps> = ({ scores, playerName, on
                 {/* Global List */}
                 <div className="flex items-center gap-2 mb-4">
                     <Globe className="w-4 h-4 text-purple-500" />
-                    <span className="text-xs font-bold text-zinc-500 uppercase tracking-widest">Top Players ({currentDifficulty})</span>
+                    <span className="text-xs font-bold text-zinc-500 uppercase tracking-widest">Top Players ({viewDifficulty})</span>
                 </div>
 
                 <div className="space-y-3 pb-safe">
