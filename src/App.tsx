@@ -122,7 +122,7 @@ function App() {
                     level={currentLevel}
                     difficulty={difficulty}
                     bestScore={scores[currentLevel.id]}
-                    onComplete={(score) => handleLevelComplete(currentLevel, score)}
+                    onComplete={(score) => handleLevelComplete(score)}
                     onNext={handleNextLevel}
                 />
             ) : (

@@ -15,7 +15,8 @@ const defaultState: GameState = {
     unlockedLevels: [1],
     scores: {},
     playerName: null,
-    theme: 'dark'
+    theme: 'dark',
+    difficulty: 'medium'
 };
 
 export const useGameStore = () => {

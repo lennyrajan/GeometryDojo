@@ -1,6 +1,7 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { Level } from '../lib/shapes';
-import { Point, calculateScore, Difficulty } from '../lib/geometry';
+import { calculateScore, Point } from '../lib/geometry';
+import { Difficulty } from '../types';
 import { RefreshCcw, ZoomIn, Check } from 'lucide-react';
 
 interface CanvasBoardProps {
