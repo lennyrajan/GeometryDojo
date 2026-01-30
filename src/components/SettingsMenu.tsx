@@ -40,8 +40,8 @@ export const SettingsMenu: React.FC<SettingsMenuProps> = ({
     };
 
     return (
-        <div className="absolute inset-0 z-50 bg-black/80 flex items-center justify-center p-6 backdrop-blur-sm">
-            <div className={`w-full max-w-md rounded-2xl shadow-2xl animate-in zoom-in-95 duration-200 bg-zinc-950 border border-zinc-800 text-white max-h-[90vh] flex flex-col`}>
+        <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4 backdrop-blur-sm">
+            <div className={`w-full max-w-md rounded-2xl shadow-2xl animate-in zoom-in-95 duration-200 bg-zinc-950 border border-zinc-800 text-white max-h-[85vh] flex flex-col`}>
 
                 {/* Fixed Header */}
                 <div className="p-6 border-b border-white/10 flex items-center justify-between shrink-0">
@@ -55,7 +55,7 @@ export const SettingsMenu: React.FC<SettingsMenuProps> = ({
                 </div>
 
                 {/* Scrollable Content */}
-                <div className="p-6 overflow-y-auto custom-scrollbar space-y-8">
+                <div className="flex-1 overflow-y-auto custom-scrollbar p-6 space-y-8 min-h-0">
 
                     {/* Player Management */}
                     <div>
