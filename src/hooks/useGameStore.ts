@@ -201,7 +201,7 @@ export const useGameStore = () => {
     };
 
     const deletePlayer = (id: string) => {
-        if (state.players.length <= 1) return; // Cannot delete active player if only one exists (though logic below handles)
+        if (state.players.length <= 1) return; // Cannot delete last player
         setState((prev: GameState) => {
             const newPlayers = prev.players.filter(p => p.id !== id);
             // If we deleted active player, switch to first available
