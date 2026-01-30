@@ -81,7 +81,7 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onComplete }) => {
                         disabled={!name.trim()}
                         className="w-full py-3 bg-lime-500 hover:bg-lime-400 text-black text-sm font-bold rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                     >
-                        Start Training
+                        Enter Dojo
                     </button>
                 </form>
             </div>
