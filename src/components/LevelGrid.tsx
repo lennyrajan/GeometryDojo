@@ -29,8 +29,7 @@ export const LevelGrid: React.FC<LevelGridProps> = ({ unlockedLevels, scores, on
                         </span>
                     </h1>
                     <p className="text-zinc-400 text-xs max-w-[200px] leading-tight">
-                        Trace perfectly. <br />
-                        <span className="text-green-500 font-bold">92%</span> accuracy required.
+                        Trace perfectly.
                     </p>
                 </div>
                 <div className="flex gap-2">
