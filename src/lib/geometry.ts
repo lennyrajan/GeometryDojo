@@ -16,31 +16,7 @@ export const resample = (path: Point[], count: number = 100): Point[] => {
 
     const totalLen = getPathLength(path);
     const step = totalLen / (count - 1);
-    const newPath: Point[] = [path[0]];
-    let currentDist = 0;
-    let nextIdx = 1;
-    let lastP = path[0];
-
-    for (let i = 1; i < count; i++) {
-        const targetDist = i * step;
-
-        // Walk forward until we cover the distance
-        while (nextIdx < path.length && currentDist + distance(lastP, path[nextIdx]) < step) {
-            currentDist += distance(lastP, path[nextIdx]);
-            lastP = path[nextIdx];
-            nextIdx++;
-        }
-
-        if (nextIdx >= path.length) {
-            newPath.push(path[path.length - 1]);
-            continue;
-        }
-
-        const d = distance(lastP, path[nextIdx]);
-        const rem = step; // Simplified, actually need to track cumulative better for precision
-        // Better algorithm:
-        // Just walk along the path
-    }
+    // Simplified approach: walk the path and pick points
 
     // Re-implementation of standard resampling
     // We'll use a simpler approach: walk the path and pick points

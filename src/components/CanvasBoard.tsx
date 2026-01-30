@@ -1,6 +1,6 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { Level } from '../lib/shapes';
-import { Point, calculateScore, fitToBox, getBoundingBox } from '../lib/geometry';
+import { Point, calculateScore } from '../lib/geometry';
 import { RefreshCcw, ZoomIn, Check } from 'lucide-react';
 
 interface CanvasBoardProps {
@@ -10,7 +10,7 @@ interface CanvasBoardProps {
     bestScore?: number;
 }
 
-export const CanvasBoard: React.FC<CanvasBoardProps> = ({ level, onComplete, onNext, bestScore }) => {
+export const CanvasBoard: React.FC<CanvasBoardProps> = ({ level, onComplete, onNext }) => {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const [isDrawing, setIsDrawing] = useState(false);
     const [points, setPoints] = useState<Point[]>([]);
@@ -23,7 +23,6 @@ export const CanvasBoard: React.FC<CanvasBoardProps> = ({ level, onComplete, onN
     // Zoom/Pan State
     const [transform, setTransform] = useState({ k: 1, x: 0, y: 0 });
     const [isZooming, setIsZooming] = useState(false);
-    const lastDist = useRef<number>(0);
     const lastCenter = useRef<Point>({ x: 0, y: 0 });
 
     useEffect(() => {
