@@ -221,6 +221,7 @@ function App() {
                     onOpenSettings={() => setShowingSettings(true)}
                     activeDifficulty={difficulty}
                     theme={theme}
+                    playerName={playerName}
                 />
             )}
         </div>

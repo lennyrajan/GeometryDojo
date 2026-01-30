@@ -12,25 +12,31 @@ interface LevelGridProps {
     onOpenSettings: () => void;
     activeDifficulty: Difficulty;
     theme: 'space' | 'classic';
+    playerName: string;
 }
 
-export const LevelGrid: React.FC<LevelGridProps> = ({ unlockedLevels, scores, onSelectLevel, onViewLeaderboard, onOpenSettings, activeDifficulty, theme }) => {
+export const LevelGrid: React.FC<LevelGridProps> = ({ unlockedLevels, scores, onSelectLevel, onViewLeaderboard, onOpenSettings, activeDifficulty, theme, playerName }) => {
     return (
         <div className="p-4 h-full flex flex-col">
             <div className="flex justify-between items-start mb-4">
-                <div>
-                    <h1 className="text-xl font-bold text-white mb-1 flex items-center gap-2">
-                        Geometry Dojo
-                        <span className={`text-[10px] uppercase font-bold px-2 py-0.5 rounded border border-white/10 ${activeDifficulty === 'easy' ? 'bg-green-500/20 text-green-400' :
-                            activeDifficulty === 'medium' ? 'bg-yellow-500/20 text-yellow-400' :
-                                'bg-red-500/20 text-red-400'
-                            }`}>
-                            {activeDifficulty}
-                        </span>
-                    </h1>
-                    <p className="text-zinc-400 text-xs max-w-[200px] leading-tight">
-                        Trace perfectly.
-                    </p>
+                    <div className="flex flex-col">
+                        <h1 className="text-xl font-bold text-white mb-1 flex items-center gap-2">
+                            Geometry Dojo
+                            <span className={`text-[10px] uppercase font-bold px-2 py-0.5 rounded border border-white/10 ${activeDifficulty === 'easy' ? 'bg-green-500/20 text-green-400' :
+                                activeDifficulty === 'medium' ? 'bg-yellow-500/20 text-yellow-400' :
+                                    'bg-red-500/20 text-red-400'
+                                }`}>
+                                {activeDifficulty}
+                            </span>
+                        </h1>
+                        <div className="flex items-center gap-2 mb-1">
+                            <div className="w-1.5 h-1.5 rounded-full bg-indigo-500 animate-pulse" />
+                            <span className="text-xs font-bold text-indigo-300 uppercase tracking-wider">{playerName}</span>
+                        </div>
+                        <p className="text-zinc-400 text-xs max-w-[200px] leading-tight opacity-50">
+                            Trace perfectly.
+                        </p>
+                    </div>
                 </div>
                 <div className="flex gap-2">
                     <button
@@ -105,6 +111,6 @@ export const LevelGrid: React.FC<LevelGridProps> = ({ unlockedLevels, scores, on
                     })}
                 </div>
             </div>
-        </div>
+        </div >
     );
 };
