@@ -7,9 +7,7 @@ interface WelcomeScreenProps {
 }
 
 export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onComplete }) => {
-    const [name, setName] = useState('');
-    const [difficulty, setDifficulty] = useState<Difficulty>('medium');
-    const [error, setError] = useState('');
+    const [showWelcome, setShowWelcome] = useState(false);
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -17,8 +15,30 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onComplete }) => {
             setError('Name must be at least 2 characters');
             return;
         }
-        onComplete(name.trim(), difficulty);
+
+        // Trigger Welcome Sequence
+        setShowWelcome(true);
+        setTimeout(() => {
+            onComplete(name.trim(), difficulty);
+        }, 2200); // Wait for animation
     };
+
+    if (showWelcome) {
+        return (
+            <div className="absolute inset-0 z-50 bg-indigo-950 flex flex-col items-center justify-center overflow-hidden">
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-indigo-900/50 via-indigo-950 to-black animate-pulse" />
+
+                <div className="relative z-10 flex flex-col items-center justify-center animate-out fade-out duration-700 delay-1500 fill-mode-forwards">
+                    <h2 className="text-2xl text-indigo-300 font-medium tracking-widest uppercase mb-4 animate-in fade-in slide-in-from-bottom-4 duration-1000">
+                        Welcome
+                    </h2>
+                    <h1 className="text-6xl md:text-8xl font-black text-white tracking-tighter uppercase animate-in zoom-in-50 fade-in duration-1000 ease-out">
+                        {name}
+                    </h1>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="absolute inset-0 z-50 bg-indigo-950 flex flex-col items-center justify-center p-6 transition-colors duration-1000">
