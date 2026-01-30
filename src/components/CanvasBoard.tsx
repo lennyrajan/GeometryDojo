@@ -2,7 +2,7 @@ import React, { useRef, useEffect, useState } from 'react';
 import { Level } from '../lib/shapes';
 import { calculateScore, Point } from '../lib/geometry';
 import { Difficulty } from '../types';
-import { RefreshCcw, ZoomIn, Check } from 'lucide-react';
+import { RefreshCcw, Check, Play, Square, X } from 'lucide-react';
 
 interface CanvasBoardProps {
     level: Level;
@@ -19,13 +19,13 @@ export const CanvasBoard: React.FC<CanvasBoardProps> = ({ level, difficulty, onC
     const [result, setResult] = useState<{ score: number; diffs: number[]; alignedUserPath: Point[] } | null>(null);
     const [showTarget, setShowTarget] = useState(true);
 
+    // Replay State
+    const [isReplaying, setIsReplaying] = useState(false);
+    const [replayProgress, setReplayProgress] = useState(0);
+    const replayFrameRef = useRef<number>();
+
     // Dimensions for normalization
     const [dimensions, setDimensions] = useState({ w: 0, h: 0 });
-
-    // Zoom/Pan State
-    const [transform, setTransform] = useState({ k: 1, x: 0, y: 0 });
-    const [isZooming, setIsZooming] = useState(false);
-    const lastCenter = useRef<Point>({ x: 0, y: 0 });
 
     useEffect(() => {
         const handleResize = () => {
@@ -42,17 +42,15 @@ export const CanvasBoard: React.FC<CanvasBoardProps> = ({ level, difficulty, onC
         handleResize();
 
         return () => window.removeEventListener('resize', handleResize);
-    }, [level, result]);
+    }, [level, result, replayProgress, isReplaying]); // Add replay deps
 
     useEffect(() => {
         // Reset when level changes
         setPoints([]);
         setResult(null);
         setIsDrawing(false);
-        setIsDrawing(false);
         setShowTarget(true);
-        setTransform({ k: 1, x: 0, y: 0 }); // Reset zoom
-        setIsZooming(false);
+        stopReplay();
         draw();
     }, [level]);
 
@@ -70,10 +68,10 @@ export const CanvasBoard: React.FC<CanvasBoardProps> = ({ level, difficulty, onC
         const offsetX = (w - size) / 2;
         const offsetY = (h - size) / 2;
 
-        // Apply Transform
+        // Apply Transform - REMOVED for Replay Mode (keep static)
         ctx.save();
-        ctx.translate(transform.x, transform.y);
-        ctx.scale(transform.k, transform.k);
+        // ctx.translate(transform.x, transform.y);
+        // ctx.scale(transform.k, transform.k);
 
         // Helper to map normalized point to canvas (Aspect Correct)
         const toCanvas = (p: Point) => ({
@@ -106,22 +104,6 @@ export const CanvasBoard: React.FC<CanvasBoardProps> = ({ level, difficulty, onC
             ctx.lineWidth = 4;
             ctx.lineCap = 'round';
             ctx.lineJoin = 'round';
-            // Points are already stored as raw canvas coords, so draw directly?
-            // Wait, points are raw canvas coords (pixels).
-            // We need to ensure they align visually with the transformed view?
-            // No, user draws in raw pixels. Transform applies to the VIEW of the canvas if we used ctx.scale on the whole thing.
-            // But here we apply ctx.translate/scale Manually for the ZOOM feature?
-            // Yes, transform applies to everything inside ctx.save().
-            // So if user draws, points are raw pixels. 
-            // If we are zoomed in, we need to transform the points to match the zoom?
-            // Or does the user draw continuously in "screen space"?
-            // Usually user draws in screen space. The canvas is just a buffer.
-
-            // Current implementation stores points in raw pixel coords (getPoint).
-            // But we apply ctx.transform before drawing user path.
-            // This means if we pan/zoom, the user's existing drawing moves.
-            // That is correct for Review mode.
-            // But during drawing, isZooming is false/transform is identity.
 
             ctx.moveTo(points[0].x, points[0].y);
             for (let i = 1; i < points.length; i++) {
@@ -135,7 +117,11 @@ export const CanvasBoard: React.FC<CanvasBoardProps> = ({ level, difficulty, onC
             const { alignedUserPath, diffs } = result;
             const alignedCanvas = alignedUserPath.map(toCanvas);
 
-            for (let i = 0; i < alignedCanvas.length - 1; i++) {
+            // Limit drawing based on replay progress
+            const limit = isReplaying ? replayProgress : alignedCanvas.length;
+
+            for (let i = 0; i < limit - 1; i++) {
+                if (i >= alignedCanvas.length - 1) break;
                 ctx.beginPath();
                 const diff = diffs[i];
                 const goodness = Math.max(0, 1 - (diff * 20));
@@ -154,7 +140,7 @@ export const CanvasBoard: React.FC<CanvasBoardProps> = ({ level, difficulty, onC
 
     useEffect(() => {
         draw();
-    }, [points, result, dimensions, transform]);
+    }, [points, result, dimensions, isReplaying, replayProgress]);
 
     const getPoint = (e: React.MouseEvent | React.TouchEvent | PointerEvent): Point | null => {
         const canvas = canvasRef.current;
@@ -171,13 +157,7 @@ export const CanvasBoard: React.FC<CanvasBoardProps> = ({ level, difficulty, onC
     };
 
     const startDrawing = (e: React.PointerEvent) => {
-        if (result) {
-            if (isZooming) {
-                e.currentTarget.setPointerCapture(e.pointerId);
-                lastCenter.current = { x: e.clientX, y: e.clientY };
-            }
-            return;
-        }
+        if (result) return; // Disable interaction if result exists
         e.currentTarget.setPointerCapture(e.pointerId);
         setIsDrawing(true);
         setPoints([]);
@@ -186,19 +166,40 @@ export const CanvasBoard: React.FC<CanvasBoardProps> = ({ level, difficulty, onC
     };
 
     const moveDrawing = (e: React.PointerEvent) => {
-        if (result && isZooming) {
-            const dx = e.clientX - lastCenter.current.x;
-            const dy = e.clientY - lastCenter.current.y;
-            setTransform(t => ({ ...t, x: t.x + dx, y: t.y + dy }));
-            lastCenter.current = { x: e.clientX, y: e.clientY };
-            return;
-        }
-
+        if (result) return; // Disable interaction if result exists
         if (!isDrawing) return;
         const p = getPoint(e);
         if (p) {
             setPoints(prev => [...prev, p]);
         }
+    };
+
+    // Replay Logic
+    const startReplay = () => {
+        if (!result) return;
+        setIsReplaying(true);
+        setReplayProgress(0);
+
+        const totalPoints = result.alignedUserPath.length;
+        const speed = Math.max(1, Math.floor(totalPoints / 60)); // Adjust speed based on length
+
+        const animate = () => {
+            setReplayProgress(prev => {
+                const next = prev + speed;
+                if (next >= totalPoints) {
+                    return totalPoints; // Keep it at max
+                }
+                replayFrameRef.current = requestAnimationFrame(animate);
+                return next;
+            });
+        };
+        replayFrameRef.current = requestAnimationFrame(animate);
+    };
+
+    const stopReplay = () => {
+        if (replayFrameRef.current) cancelAnimationFrame(replayFrameRef.current);
+        setIsReplaying(false);
+        setReplayProgress(0);
     };
 
     // Dynamic Feedback Messages
@@ -242,22 +243,13 @@ export const CanvasBoard: React.FC<CanvasBoardProps> = ({ level, difficulty, onC
     };
 
     const reset = () => {
+        stopReplay();
         setPoints([]);
         setResult(null);
         setIsDrawing(false);
-        setIsZooming(false);
-        setTransform({ k: 1, x: 0, y: 0 });
     };
 
-    const toggleZoom = () => {
-        if (!isZooming) {
-            setTransform({ k: 2, x: -dimensions.w / 2, y: -dimensions.h / 2 }); // Initial zoom in to center
-            setIsZooming(true);
-        } else {
-            setTransform({ k: 1, x: 0, y: 0 });
-            setIsZooming(false);
-        }
-    };
+
 
     return (
         <div className="relative w-full h-full flex flex-col items-center justify-center bg-background">
@@ -287,10 +279,10 @@ export const CanvasBoard: React.FC<CanvasBoardProps> = ({ level, difficulty, onC
 
                     <div className="flex gap-4 pointer-events-auto">
                         <button
-                            onClick={toggleZoom}
+                            onClick={startReplay}
                             className="p-4 rounded-full bg-white/10 hover:bg-white/20 transition-colors"
                         >
-                            <ZoomIn className="w-6 h-6 text-white" />
+                            <Play className="w-6 h-6 text-white" />
                         </button>
                         <button
                             onClick={reset}
@@ -310,26 +302,14 @@ export const CanvasBoard: React.FC<CanvasBoardProps> = ({ level, difficulty, onC
                 </div>
             )}
 
-            {/* Zoom Controls Overlay */}
-            {isZooming && (
+            {/* Replay Controls Overlay */}
+            {isReplaying && (
                 <div className="absolute bottom-8 right-8 flex gap-2 pointer-events-auto">
                     <button
-                        onClick={() => setTransform(t => ({ ...t, k: t.k * 1.2 }))}
-                        className="p-3 bg-white/10 backdrop-blur rounded-full"
+                        onClick={stopReplay}
+                        className="p-3 bg-red-500/80 backdrop-blur rounded-full text-sm font-bold text-white shadow-lg"
                     >
-                        +
-                    </button>
-                    <button
-                        onClick={() => setTransform(t => ({ ...t, k: t.k / 1.2 }))}
-                        className="p-3 bg-white/10 backdrop-blur rounded-full"
-                    >
-                        -
-                    </button>
-                    <button
-                        onClick={toggleZoom}
-                        className="p-3 bg-red-500/80 backdrop-blur rounded-full text-sm font-bold"
-                    >
-                        X
+                        <X className="w-6 h-6" />
                     </button>
                 </div>
             )}
