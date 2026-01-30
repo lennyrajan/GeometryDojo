@@ -23,7 +23,7 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onComplete }) => {
         setShowWelcome(true);
         setTimeout(() => {
             onComplete(name.trim(), difficulty);
-        }, 2200); // Wait for animation
+        }, 1500); // Wait for animation
     };
 
     if (showWelcome) {

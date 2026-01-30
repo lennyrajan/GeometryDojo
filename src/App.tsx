@@ -84,6 +84,12 @@ function App() {
 
     return (
         <div className={`w-full h-screen ${bgClass} text-white overflow-hidden flex flex-col transition-colors duration-500`}>
+            {/* Dynamic Background (Applies to Game & Menu) */}
+            <div className="absolute inset-0 overflow-hidden pointer-events-none">
+                <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl animate-pulse" />
+                <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-indigo-500/10 rounded-full blur-3xl animate-pulse delay-1000" />
+            </div>
+
             {/* Settings Modal */}
             {showingSettings && (
                 <SettingsMenu
@@ -112,13 +118,17 @@ function App() {
             {currentLevel && (
                 <div className="absolute top-0 left-0 right-0 z-40 p-4 flex items-center justify-between pointer-events-none">
 
-                    <div className="pointer-events-auto flex items-center gap-2">
+                    <div className="pointer-events-auto flex items-center gap-3">
                         <button
                             onClick={() => setCurrentLevel(null)}
                             className="p-2 bg-black/40 backdrop-blur rounded-full text-white hover:bg-white/10 transition-colors border border-white/5"
                         >
                             <ArrowLeft className="w-5 h-5" />
                         </button>
+                        <div className="hidden md:flex items-center gap-2 px-3 py-1.5 bg-black/40 backdrop-blur rounded-full border border-white/5">
+                            <div className="w-2 h-2 rounded-full bg-indigo-500 animate-pulse" />
+                            <span className="text-xs font-bold text-indigo-200 uppercase tracking-wider">{playerName}</span>
+                        </div>
                     </div>
 
                     <div className="pointer-events-auto flex items-center gap-3 bg-black/40 backdrop-blur px-4 py-2 rounded-full border border-white/5 shadow-lg">
