@@ -198,9 +198,10 @@ export const calculateScore = (userPath: Point[], targetPath: Point[]): { score:
         let diff = Math.abs(userAngle - targetAngle);
 
         // IGNORE small deviations (Tolerance Buffer)
-        // This allows for "rounded corners" or hand wobbles (up to 20 degrees)
-        // but still catches the massive error of Circle (170ish) vs Square (90) which is ~80 deg diff.
-        diff = Math.max(0, diff - 20);
+        // Increased to 30 degrees to be more liberal with rounded corners.
+        // Circle vs Square (90 vs 180) is 90 diff. 90 - 30 = 60 penalty.
+        // Rounded Corner (135 vs 90) is 45 diff. 45 - 30 = 15 penalty.
+        diff = Math.max(0, diff - 30);
 
         angleDiffs.push(diff);
     }
@@ -212,10 +213,10 @@ export const calculateScore = (userPath: Point[], targetPath: Point[]): { score:
     // Scoring Formula
     // AvgDist * 300: Base spatial match
     // MaxDist * 50: Max spatial deviation
-    // MaxAngleDiff * 1.5: Max shape mismatch (missing a corner) - Increased slightly since we have a buffer now
-    // AvgAngleDiff * 0.5: General shape mismatch
+    // MaxAngleDiff * 1.0: Max shape mismatch (missing a corner) - Reduced from 1.5
+    // AvgAngleDiff * 0.2: General shape mismatch - Reduced from 0.5
 
-    const totalPenalty = (avgDist * 300) + (maxDist * 50) + (maxAngleDiff * 1.5) + (avgAngleDiff * 0.5);
+    const totalPenalty = (avgDist * 300) + (maxDist * 50) + (maxAngleDiff * 1.0) + (avgAngleDiff * 0.2);
     const score = Math.max(0, 100 - totalPenalty);
 
     return { score, diffs, alignedUserPath: bestUserPath };
