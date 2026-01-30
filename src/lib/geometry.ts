@@ -104,53 +104,72 @@ export const calculateScore = (userPath: Point[], targetPath: Point[]): { score:
     const targetBox = getBoundingBox(targetResampled);
     const userAligned = fitToBox(userResampled, targetBox);
 
-    // 3. Compare
-    let totalDist = 0;
+    // 3. Compare with Cyclic Shift
+    // Improved algorithm: Try all cyclic shifts of the target path to find the best start-point alignment.
+    // Also check both normal and reversed directions for the user path.
+
+    let minTotalDist = Infinity;
+    let bestUserPath: Point[] = [];
+    let bestShift = 0;
+
+    // Helper to calc distance for a specific shift between two arrays of same length
+    const calcDist = (uPath: Point[], tPath: Point[], shift: number) => {
+        let d = 0;
+        for (let i = 0; i < count; i++) {
+            const tIdx = (i + shift) % count;
+            d += distance(uPath[i], tPath[tIdx]);
+        }
+        return d;
+    };
+
+    // Check Normal Direction
+    for (let shift = 0; shift < count; shift++) {
+        const d = calcDist(userAligned, targetResampled, shift);
+        if (d < minTotalDist) {
+            minTotalDist = d;
+            bestUserPath = userAligned; // Normal orientation
+            bestShift = shift;
+        }
+    }
+
+    // Check Reverse Direction
+    const userReversed = [...userAligned].reverse();
+    for (let shift = 0; shift < count; shift++) {
+        const d = calcDist(userReversed, targetResampled, shift);
+        if (d < minTotalDist) {
+            minTotalDist = d;
+            bestUserPath = userReversed;
+            bestShift = shift;
+        }
+    }
+
+    // Generate diffs for the best match
     const diffs: number[] = [];
-
-    // We need to check direction. If user drew clockwise vs counter-clockwise, points won't match.
-    // Simple check: Check distance for normal and reversed, take min.
-
-    let distNormal = 0;
-    let distReverse = 0;
-
     for (let i = 0; i < count; i++) {
-        distNormal += distance(userAligned[i], targetResampled[i]);
-        distReverse += distance(userAligned[count - 1 - i], targetResampled[i]);
+        const tIdx = (i + bestShift) % count;
+        diffs.push(distance(bestUserPath[i], targetResampled[tIdx]));
     }
 
-    let finalUserPath = userAligned;
-    if (distReverse < distNormal) {
-        // Reverse user path for "heatmap" visual alignment, though for pure score we just need the number
-        // But we return diffs for heatmap, so we actually need to know WHICH point matches.
-        // If reversed, we should probably reverse the array for the return value
-        finalUserPath = userAligned.reverse();
-        totalDist = distReverse;
-    } else {
-        totalDist = distNormal;
-    }
+    // For visualization, we need to return the user path aligned to the target.
+    // However, the `bestUserPath` is just reversed or not. The `diffs` correspond to comparing
+    // bestUserPath[i] with target[(i + shift) % N].
+    // To minimize complexity for the consumer (CanvasBoard), let's just return the bestUserPath,
+    // and the diffs array already matches it index-for-index against the *shifted* target.
+    // BUT the CanvasBoard draws the target as `level.shape`. It doesn't know about shifts.
+    // Actually, heatmap logic in CanvasBoard iterates 0..N of alignedUserPath and uses diffs[i].
+    // It draws the user path segment colors. The diff[i] says "how far was this user segment from the matched target segment".
+    // So if we just return bestUserPath and the corresponding diffs, the heatmap on the user's line will be correct.
+    // The target line (white/faint) is drawn separately and static. That is fine.
 
-    // Calculate per-point diffs for heatmap
-    for (let i = 0; i < count; i++) {
-        diffs.push(distance(finalUserPath[i], targetResampled[i]));
-    }
-
-    const avgDist = totalDist / count;
+    const avgDist = minTotalDist / count;
 
     // Scoring formula:
-    // Perfect = 100.
-    // How much tolerance? 
-    // Box is roughly 0.8 size (if 0-1).
-    // A deviation of 0.01 (1%) is pretty good.
-    // Let's say avgDist of 0.005 is 100%. 0.05 is 0%.
-    // Tune this.
+    // With better alignment, the distances should be much smaller for good shapes.
+    // Previous: 100 - (avgDist * 200). 
+    // If avgDist is 0.01 (1%), score was 98.
+    // Now that alignment is fixed, 0.01 should still be a high score.
+    // Let's keep the multiplier rigid to reward precision.
+    const score = Math.max(0, 100 - (avgDist * 300));
 
-    // strict version:
-    // Score = 100 - (avgDist * 1000) ? 
-    // If avgDist is 0.01 (1% screen width off average), Score = 90.
-    // That feels fair.
-
-    const score = Math.max(0, 100 - (avgDist * 200));
-
-    return { score, diffs, alignedUserPath: finalUserPath };
+    return { score, diffs, alignedUserPath: bestUserPath };
 };
