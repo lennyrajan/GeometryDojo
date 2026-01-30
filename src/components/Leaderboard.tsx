@@ -1,41 +1,50 @@
-import React, { useState } from 'react';
-import { ArrowLeft, Globe, User } from 'lucide-react';
+import React, { useState, useMemo } from 'react';
+import { ArrowLeft, Globe, Medal, Trophy } from 'lucide-react';
 import { Difficulty } from '../types';
+import { PlayerProfile } from '../hooks/useGameStore';
 
 interface LeaderboardProps {
-    allScores: {
-        easy: Record<number, number>;
-        medium: Record<number, number>;
-        hard: Record<number, number>;
-    };
-    playerName: string | null;
+    players: PlayerProfile[];
+    activePlayerId: string;
     onBack: () => void;
     initialDifficulty: Difficulty;
     theme: 'space' | 'classic';
 }
 
-export const Leaderboard: React.FC<LeaderboardProps> = ({ allScores, playerName, onBack, initialDifficulty, theme }) => {
+export const Leaderboard: React.FC<LeaderboardProps> = ({ players, activePlayerId, onBack, initialDifficulty, theme }) => {
     // Local state for viewing, disjoint from global game difficulty
     const [viewDifficulty, setViewDifficulty] = useState<Difficulty>(initialDifficulty);
 
-    const scores = allScores[viewDifficulty];
+    // Calculate Rankings for the selected difficulty
+    const rankings = useMemo(() => {
+        return players.map((player: PlayerProfile) => {
+            const scores = player.scores[viewDifficulty];
+            const unlocked = player.unlockedLevels[viewDifficulty];
 
-    // Calculate User Stats
-    const totalScore = Object.values(scores).reduce((a, b) => a + b, 0);
-    const completedLevels = Object.keys(scores).length;
-    const average = completedLevels > 0 ? totalScore / completedLevels : 0;
+            const totalScore = Object.values(scores).reduce((a: number, b: number) => a + b, 0);
+            const completedCount = Object.keys(scores).length;
+            const average = completedCount > 0 ? totalScore / completedCount : 0;
+            const highestLevel = Math.max(...unlocked, 0);
 
-    // Mock Global Data (Could vary based on difficulty)
-    const globalRankings = [
-        { name: "GeometryGod", score: 99.8, rank: 1 },
-        { name: "ShapeShifter", score: 99.5, rank: 2 },
-        { name: "PolyGon", score: 99.1, rank: 3 },
-        { name: "LineMaster", score: 98.7, rank: 4 },
-        { name: "CircleFan", score: 98.2, rank: 5 },
-        { name: "AngleAngel", score: 97.5, rank: 6 },
-        { name: "VertexViper", score: 97.1, rank: 7 },
-        { name: "EdgeLord", score: 96.8, rank: 8 },
-    ];
+            return {
+                id: player.id,
+                name: player.name || "Anonymous Student",
+                average,
+                highestLevel,
+                totalScore, // Secondary sort
+                isMe: player.id === activePlayerId
+            };
+        })
+            .filter(p => p.highestLevel > 0 || p.average > 0) // Only show players who have started
+            .sort((a: any, b: any) => {
+                if (b.highestLevel !== a.highestLevel) return b.highestLevel - a.highestLevel;
+                return b.average - a.average;
+            })
+            .map((p, index: number) => ({ ...p, rank: index + 1 }));
+    }, [players, viewDifficulty, activePlayerId]);
+
+    // Current Player Stats
+    const myStats = rankings.find((r: any) => r.isMe);
 
     return (
         <div className={`flex flex-col h-full overflow-hidden ${theme === 'space' ? 'bg-indigo-950 text-white' : 'bg-zinc-950 text-white'}`}>
@@ -47,18 +56,18 @@ export const Leaderboard: React.FC<LeaderboardProps> = ({ allScores, playerName,
                 >
                     <ArrowLeft className={`w-5 h-5 ${theme === 'space' ? 'text-indigo-200' : 'text-zinc-400'}`} />
                 </button>
-                <h1 className="text-2xl font-bold">Leaderboard</h1>
+                <h1 className="text-2xl font-bold">Hall of Fame</h1>
             </div>
 
             {/* Difficulty Tabs */}
             <div className="px-6 py-4">
-                <div className="flex p-1 bg-zinc-900 rounded-xl border border-zinc-800">
+                <div className="flex p-1 bg-zinc-900/50 rounded-xl border border-white/5 backdrop-blur-sm">
                     {(['easy', 'medium', 'hard'] as Difficulty[]).map(d => (
                         <button
                             key={d}
                             onClick={() => setViewDifficulty(d)}
-                            className={`flex-1 py-2 text-xs font-bold uppercase tracking-wider rounded-lg transition-all ${viewDifficulty === d
-                                ? 'bg-white text-black shadow'
+                            className={`flex-1 py-2 text-[10px] font-black uppercase tracking-[0.2em] rounded-lg transition-all ${viewDifficulty === d
+                                ? 'bg-indigo-500 text-white shadow-lg shadow-indigo-500/20'
                                 : 'text-zinc-500 hover:text-zinc-300'
                                 }`}
                         >
@@ -70,65 +79,83 @@ export const Leaderboard: React.FC<LeaderboardProps> = ({ allScores, playerName,
 
             <div className="flex-1 overflow-y-auto px-6 pb-6 custom-scrollbar">
                 {/* User Stats Card */}
-                <div className={`rounded-2xl p-6 mb-8 border transition-colors ${viewDifficulty === 'easy' ? 'bg-green-900/10 border-green-500/20' :
-                    viewDifficulty === 'medium' ? 'bg-yellow-900/10 border-yellow-500/20' :
-                        'bg-red-900/10 border-red-500/20'
-                    } shrink-0`}>
-                    <div className="flex items-center gap-3 mb-4">
-                        <User className="w-5 h-5 opacity-70" />
-                        <span className="font-mono text-sm opacity-70">YOUR STATS ({viewDifficulty.toUpperCase()})</span>
-                    </div>
-                    <div className="grid grid-cols-2 gap-4">
-                        <div>
-                            <div className="text-xs uppercase tracking-wider mb-1 opacity-50">Total Avg</div>
-                            <div className="text-3xl font-black">{average.toFixed(1)}%</div>
+                {myStats && (
+                    <div className={`rounded-2xl p-6 mb-8 border transition-all duration-500 ${viewDifficulty === 'easy' ? 'bg-green-500/5 border-green-500/20' :
+                        viewDifficulty === 'medium' ? 'bg-yellow-500/5 border-yellow-500/20' :
+                            'bg-red-500/5 border-red-500/20'
+                        } shrink-0 shadow-2xl relative overflow-hidden group`}>
+                        <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                            <Trophy className="w-24 h-24" />
                         </div>
-                        <div>
-                            <div className="text-xs uppercase tracking-wider mb-1 opacity-50">Levels</div>
-                            <div className="text-3xl font-black">{completedLevels}</div>
+
+                        <div className="flex items-center gap-3 mb-4 relative z-10 text-indigo-400">
+                            <Medal className="w-5 h-5" />
+                            <span className="font-black text-[10px] uppercase tracking-[0.2em]">Your Standing</span>
+                        </div>
+                        <div className="grid grid-cols-3 gap-4 relative z-10">
+                            <div>
+                                <div className="text-[10px] uppercase tracking-wider mb-1 opacity-40 font-bold">Rank</div>
+                                <div className="text-3xl font-black text-white">#{myStats.rank}</div>
+                            </div>
+                            <div>
+                                <div className="text-[10px] uppercase tracking-wider mb-1 opacity-40 font-bold">Max Level</div>
+                                <div className="text-3xl font-black text-white">{myStats.highestLevel}</div>
+                            </div>
+                            <div>
+                                <div className="text-[10px] uppercase tracking-wider mb-1 opacity-40 font-bold">Avg Accuracy</div>
+                                <div className="text-3xl font-black text-white">{myStats.average.toFixed(1)}%</div>
+                            </div>
                         </div>
                     </div>
-                </div>
+                )}
 
                 {/* Global List */}
                 <div className="flex items-center gap-2 mb-4">
-                    <Globe className="w-4 h-4 text-purple-500" />
-                    <span className="text-xs font-bold text-zinc-500 uppercase tracking-widest">Top Players ({viewDifficulty})</span>
+                    <Globe className="w-4 h-4 text-indigo-400" />
+                    <span className="text-[10px] font-black text-zinc-500 uppercase tracking-[0.2em]">Global Class Ranking ({viewDifficulty})</span>
                 </div>
 
-                <div className="space-y-3 pb-safe">
-                    {/* Your Entry (Pinned if high enough, or inserted) */}
-                    {completedLevels > 0 && (
-                        <div className="flex items-center justify-between p-4 bg-white/5 rounded-xl border border-white/10 mb-4 sticky top-0 backdrop-blur-md z-10 shadow-lg">
-                            <div className="flex items-center gap-4">
-                                <span className="w-8 h-8 flex items-center justify-center rounded-full font-bold text-sm bg-white text-black">
-                                    ?
-                                </span>
-                                <div>
-                                    <span className="font-bold block">{playerName || "You"}</span>
-                                    <span className="text-xs opacity-50">Current Player</span>
-                                </div>
-                            </div>
-                            <div className="font-mono font-bold text-xl">{average.toFixed(1)}%</div>
-                        </div>
-                    )}
-
-                    {globalRankings.map((player) => (
-                        <div key={player.rank} className="flex items-center justify-between p-4 bg-zinc-900/50 rounded-xl border border-zinc-800/50">
+                <div className="space-y-4 pb-safe">
+                    {rankings.map((player) => (
+                        <div key={player.id} className={`flex items-center justify-between p-4 rounded-2xl border transition-all ${player.isMe
+                            ? 'bg-indigo-500/10 border-indigo-500/40 shadow-indigo-500/10'
+                            : 'bg-zinc-900/40 border-white/5'
+                            }`}>
                             <div className="flex items-center gap-4">
                                 <span className={`
-                                    w-8 h-8 flex items-center justify-center rounded-full font-bold text-sm
-                                    ${player.rank === 1 ? 'bg-yellow-500/10 text-yellow-500' :
-                                        player.rank === 2 ? 'bg-zinc-400/10 text-zinc-400' :
-                                            player.rank === 3 ? 'bg-orange-700/10 text-orange-700' : 'bg-zinc-800 text-zinc-500'}
+                                    w-10 h-10 flex items-center justify-center rounded-xl font-black text-sm transition-transform
+                                    ${player.rank === 1 ? 'bg-yellow-500/20 text-yellow-500 scale-110 shadow-lg shadow-yellow-500/20' :
+                                        player.rank === 2 ? 'bg-zinc-400/20 text-zinc-300' :
+                                            player.rank === 3 ? 'bg-orange-700/20 text-orange-400' : 'bg-zinc-800/50 text-zinc-500'}
                                 `}>
                                     {player.rank}
                                 </span>
-                                <span className="font-medium text-zinc-200">{player.name}</span>
+                                <div>
+                                    <span className={`font-bold block ${player.isMe ? 'text-white' : 'text-zinc-300'}`}>
+                                        {player.name}
+                                        {player.isMe && <span className="ml-2 text-[8px] bg-indigo-500 text-white px-1.5 py-0.5 rounded uppercase">You</span>}
+                                    </span>
+                                    <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">
+                                        Level {player.highestLevel} Reached
+                                    </span>
+                                </div>
                             </div>
-                            <div className="font-mono font-bold text-green-500">{player.score}%</div>
+                            <div className="text-right">
+                                <div className={`font-mono font-black text-xl ${player.average >= 95 ? 'text-green-400' :
+                                    player.average >= 90 ? 'text-yellow-400' : 'text-zinc-400'
+                                    }`}>
+                                    {player.average.toFixed(1)}%
+                                </div>
+                                <div className="text-[8px] text-zinc-600 font-bold uppercase tracking-tighter">Avg Accuracy</div>
+                            </div>
                         </div>
                     ))}
+
+                    {rankings.length === 0 && (
+                        <div className="py-20 text-center">
+                            <div className="text-zinc-700 text-xs font-bold uppercase tracking-widest">No entries recorded for this difficulty</div>
+                        </div>
+                    )}
                 </div>
             </div>
         </div>

@@ -71,8 +71,8 @@ function App() {
     if (viewingLeaderboard) {
         return (
             <Leaderboard
-                allScores={activePlayer.scores}
-                playerName={playerName}
+                players={allPlayers}
+                activePlayerId={activePlayer.id}
                 onBack={() => setViewingLeaderboard(false)}
                 initialDifficulty={difficulty}
                 theme={theme}
