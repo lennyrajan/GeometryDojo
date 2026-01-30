@@ -3,14 +3,30 @@ import { useGameStore } from './hooks/useGameStore';
 import { LevelGrid } from './components/LevelGrid';
 import { CanvasBoard } from './components/CanvasBoard';
 import { Leaderboard } from './components/Leaderboard';
+import { WelcomeScreen } from './components/WelcomeScreen';
+import { SettingsMenu } from './components/SettingsMenu';
 import { Level } from './lib/shapes';
 import levels from './lib/shapes';
 import { ArrowLeft } from 'lucide-react';
 
 function App() {
-    const { unlockedLevels, scores, submitScore, resetProgress } = useGameStore();
+
+    const {
+        unlockedLevels,
+        scores,
+        submitScore,
+        playerName,
+        setPlayerName,
+        theme,
+        setTheme,
+        resetProgress,
+        clearLeaderboard,
+        factoryReset
+    } = useGameStore();
+
     const [currentLevel, setCurrentLevel] = useState<Level | null>(null);
     const [viewingLeaderboard, setViewingLeaderboard] = useState(false);
+    const [showingSettings, setShowingSettings] = useState(false);
 
     const handleLevelSelect = (level: Level) => {
         setCurrentLevel(level);
@@ -34,20 +50,44 @@ function App() {
         }
     };
 
+    // 1. Welcome Screen Check
+    if (!playerName) {
+        return <WelcomeScreen onComplete={setPlayerName} />;
+    }
+
+    // 2. Leaderboard View
     if (viewingLeaderboard) {
         return (
             <Leaderboard
                 scores={scores}
+                playerName={playerName}
                 onBack={() => setViewingLeaderboard(false)}
             />
         );
     }
 
     return (
-        <div className="w-full h-screen bg-black overflow-hidden flex flex-col">
+        <div className={`w-full h-screen bg-zinc-950 overflow-hidden flex flex-col transition-colors duration-500 theme-${theme}`}>
+            {/* Settings Modal */}
+            {showingSettings && (
+                <SettingsMenu
+                    currentTheme={theme}
+                    onSetTheme={setTheme}
+                    onClose={() => setShowingSettings(false)}
+                    onClearLeaderboard={() => {
+                        clearLeaderboard();
+                        setShowingSettings(false);
+                    }}
+                    onFactoryReset={() => {
+                        factoryReset();
+                        setShowingSettings(false);
+                    }}
+                />
+            )}
+
             {/* Game Header */}
             {currentLevel && (
-                <div className="absolute top-0 left-0 right-0 z-50 p-4 flex justify-between items-center pointer-events-none">
+                <div className="absolute top-0 left-0 right-0 z-40 p-4 flex justify-between items-center pointer-events-none">
                     <button
                         onClick={() => setCurrentLevel(null)}
                         className="pointer-events-auto p-2 bg-black/50 backdrop-blur rounded-full text-white hover:bg-white/10 transition-colors"
@@ -82,7 +122,7 @@ function App() {
                     unlockedLevels={unlockedLevels}
                     scores={scores}
                     onSelectLevel={handleLevelSelect}
-                    onReset={resetProgress}
+                    onReset={() => setShowingSettings(true)} // Re-purposed "Reset" button to open Settings for now, or we update LevelGrid prop name
                     onViewLeaderboard={() => setViewingLeaderboard(true)}
                 />
             )}

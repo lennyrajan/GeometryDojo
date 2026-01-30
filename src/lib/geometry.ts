@@ -206,10 +206,13 @@ export const calculateScore = (userPath: Point[], targetPath: Point[]): { score:
     // Scoring Formula
     // AvgDist * 300: Base spatial match
     // MaxDist * 50: Max spatial deviation
-    // MaxAngleDiff * 1.5: Max shape mismatch (missing a corner)
-    // AvgAngleDiff * 2: General shape mismatch
+    // MaxAngleDiff * 1.0: Max shape mismatch (missing a corner) - Reduced from 2.0
+    // AvgAngleDiff * 0.5: General shape mismatch - Reduced from 3.0
 
-    const totalPenalty = (avgDist * 300) + (maxDist * 50) + (maxAngleDiff * 2.0) + (avgAngleDiff * 3.0);
+    // "Cut some slack": Allow wobbly hands (10-15 deg error) to still get > 92%.
+    // Circle error (40 deg) will still be -40 points -> Fail.
+
+    const totalPenalty = (avgDist * 300) + (maxDist * 50) + (maxAngleDiff * 1.0) + (avgAngleDiff * 0.5);
     const score = Math.max(0, 100 - totalPenalty);
 
     return { score, diffs, alignedUserPath: bestUserPath };

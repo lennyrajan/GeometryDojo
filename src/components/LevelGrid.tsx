@@ -1,6 +1,6 @@
 import React from 'react';
 import { Level } from '../lib/shapes';
-import { Lock, Trophy } from 'lucide-react';
+import { Lock, Trophy, Settings } from 'lucide-react';
 import levels from '../lib/shapes';
 
 interface LevelGridProps {
@@ -83,16 +83,13 @@ export const LevelGrid: React.FC<LevelGridProps> = ({ unlockedLevels, scores, on
                 </div>
             </div>
 
-            <div className="mt-4 pt-4 border-t border-zinc-900">
+            <div className="mt-4 pt-4 border-t border-zinc-900 flex justify-center">
                 <button
-                    onClick={() => {
-                        if (confirm("Are you sure you want to completely reset your progress? This cannot be undone.")) {
-                            onReset();
-                        }
-                    }}
-                    className="w-full py-3 text-xs font-bold text-red-500/50 hover:text-red-500 uppercase tracking-widest hover:bg-zinc-900 rounded-lg transition-all"
+                    onClick={onReset}
+                    className="flex items-center gap-2 px-6 py-3 text-xs font-bold text-zinc-500 hover:text-white uppercase tracking-widest hover:bg-zinc-900 rounded-lg transition-all"
                 >
-                    Reset Progress
+                    <Settings className="w-4 h-4" />
+                    Settings
                 </button>
             </div>
         </div>
