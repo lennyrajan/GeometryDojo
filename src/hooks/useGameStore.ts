@@ -27,7 +27,7 @@ interface GameState {
     theme: 'space' | 'classic';
 }
 
-const ALL_LEVELS_HACK = Array.from({ length: 20 }, (_, i) => i + 1);
+const ALL_LEVELS_HACK = Array.from({ length: 30 }, (_, i) => i + 1);
 
 const defaultPlayer: PlayerProfile = {
     id: 'player-1',
