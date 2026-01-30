@@ -1,4 +1,11 @@
+import { Difficulty } from '../types';
+
 export type Point = { x: number; y: number };
+
+// ... (existing code helpers)
+
+// Remove local Difficulty type definition if it exists around here, it's now imported.
+
 
 export const distance = (p1: Point, p2: Point) => Math.hypot(p1.x - p2.x, p1.y - p2.y);
 
@@ -94,7 +101,6 @@ export const fitToBox = (path: Point[], targetBox: { minX: number, maxX: number,
     }));
 };
 
-export type Difficulty = 'easy' | 'medium' | 'hard';
 
 const SAMPLING_POINTS = 100;
 

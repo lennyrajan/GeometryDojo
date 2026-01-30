@@ -1,6 +1,6 @@
 import React from 'react';
 import { Settings, X, Trash2, Monitor, Swords } from 'lucide-react';
-import { Theme, Difficulty } from '../hooks/useGameStore';
+import { Theme, Difficulty } from '../types';
 
 interface SettingsMenuProps {
     currentTheme: Theme;
@@ -55,8 +55,8 @@ export const SettingsMenu: React.FC<SettingsMenuProps> = ({
                                 key={d}
                                 onClick={() => onSetDifficulty(d)}
                                 className={`py-3 px-3 rounded-xl text-sm font-bold capitalize transition-all border ${currentDifficulty === d
-                                        ? 'bg-lime-500 text-black border-lime-500 shadow-lg shadow-lime-500/20'
-                                        : 'bg-zinc-950 text-zinc-400 border-zinc-800 hover:border-zinc-700'
+                                    ? 'bg-lime-500 text-black border-lime-500 shadow-lg shadow-lime-500/20'
+                                    : 'bg-zinc-950 text-zinc-400 border-zinc-800 hover:border-zinc-700'
                                     }`}
                             >
                                 {d}

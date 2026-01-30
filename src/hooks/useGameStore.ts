@@ -1,15 +1,14 @@
 import { useState, useEffect } from 'react';
+import { Difficulty, Theme } from '../types';
 
 const STORAGE_KEY = 'geometry-dojo-v1';
-
-
-export type Theme = 'dark' | 'light' | 'colorful' | 'retro';
 
 interface GameState {
     unlockedLevels: number[];
     scores: Record<number, number>; // levelId -> bestScore
     playerName: string | null;
     theme: Theme;
+    difficulty: Difficulty;
 }
 
 const defaultState: GameState = {

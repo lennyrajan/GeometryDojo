@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { User, Swords } from 'lucide-react';
-import { Difficulty } from '../hooks/useGameStore';
+import { User } from 'lucide-react';
+import { Difficulty } from '../types';
 
 interface WelcomeScreenProps {
     onComplete: (name: string, difficulty: Difficulty) => void;
@@ -61,8 +61,8 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onComplete }) => {
                                     type="button"
                                     onClick={() => setDifficulty(d)}
                                     className={`py-2 px-3 rounded-lg text-sm font-bold capitalize transition-all ${difficulty === d
-                                            ? 'bg-lime-500 text-black shadow-lg shadow-lime-500/20'
-                                            : 'bg-zinc-950 text-zinc-400 border border-zinc-800 hover:border-zinc-700'
+                                        ? 'bg-lime-500 text-black shadow-lg shadow-lime-500/20'
+                                        : 'bg-zinc-950 text-zinc-400 border border-zinc-800 hover:border-zinc-700'
                                         }`}
                                 >
                                     {d}

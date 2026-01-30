@@ -33,13 +33,13 @@ function App() {
         setCurrentLevel(level);
     };
 
-    const handleComplete = (score: number) => {
+    const handleLevelComplete = (score: number) => {
         if (currentLevel) {
             submitScore(currentLevel.id, score);
         }
     };
 
-    const handleNext = () => {
+    const handleNextLevel = () => {
         if (currentLevel) {
             const nextId = currentLevel.id + 1;
             const nextLevel = levels.find(l => l.id === nextId);
