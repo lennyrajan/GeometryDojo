@@ -36,6 +36,7 @@ function App() {
     const [showingSettings, setShowingSettings] = useState(false);
     const [resetKey, setResetKey] = useState(0);
     const [showFact, setShowFact] = useState(false);
+    const [gridScrollTop, setGridScrollTop] = useState(0);
 
     const handleLevelSelect = (level: Level) => {
         setCurrentLevel(level);
@@ -222,6 +223,8 @@ function App() {
                     activeDifficulty={difficulty}
                     theme={theme}
                     playerName={playerName}
+                    initialScrollTop={gridScrollTop}
+                    onScroll={setGridScrollTop}
                 />
             )}
         </div>

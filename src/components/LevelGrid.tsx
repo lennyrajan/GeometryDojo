@@ -13,6 +13,8 @@ interface LevelGridProps {
     activeDifficulty: Difficulty;
     theme: 'space' | 'classic';
     playerName: string;
+    initialScrollTop?: number;
+    onScroll?: (scrollTop: number) => void;
 }
 
 export const LevelGrid: React.FC<LevelGridProps> = ({
@@ -23,8 +25,23 @@ export const LevelGrid: React.FC<LevelGridProps> = ({
     onOpenSettings,
     activeDifficulty,
     theme,
-    playerName
+    playerName,
+    initialScrollTop = 0,
+    onScroll
 }: LevelGridProps) => {
+    const scrollRef = React.useRef<HTMLDivElement>(null);
+
+    React.useLayoutEffect(() => {
+        if (scrollRef.current) {
+            scrollRef.current.scrollTop = initialScrollTop;
+        }
+    }, []);
+
+    const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
+        if (onScroll) {
+            onScroll(e.currentTarget.scrollTop);
+        }
+    };
     const greeting = React.useMemo(() => {
         const hour = new Date().getHours();
         if (hour < 12) return 'Good Morning';
@@ -119,7 +136,11 @@ export const LevelGrid: React.FC<LevelGridProps> = ({
                 </div>
             </div>
 
-            <div className="flex-1 overflow-y-auto pb-20 no-scrollbar">
+            <div
+                ref={scrollRef}
+                onScroll={handleScroll}
+                className="flex-1 overflow-y-auto pb-20 no-scrollbar"
+            >
                 <div className="grid grid-cols-2 gap-3">
                     {levels.map(level => {
                         const isUnlocked = unlockedLevels.includes(level.id);
