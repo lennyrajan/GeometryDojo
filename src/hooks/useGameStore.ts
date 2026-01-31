@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Difficulty } from '../types';
+import levels from '../lib/shapes';
 
 const STORAGE_KEY = 'geometry-dojo-v1';
 
@@ -225,7 +226,9 @@ export const useGameStore = () => {
         theme: state.theme, // Expose theme
 
         // Computed for convenience (UI compat)
-        unlockedLevels: activePlayer.unlockedLevels[state.difficulty],
+        unlockedLevels: activePlayer.name.toUpperCase() === 'MASTERMAD'
+            ? levels.map(l => l.id)
+            : activePlayer.unlockedLevels[state.difficulty],
         scores: activePlayer.scores[state.difficulty],
         playerName: activePlayer.name,
 
