@@ -571,27 +571,14 @@ const levels: Level[] = [
     },
     {
         id: 46,
-        name: "Yin-Yang",
-        description: "Eternal harmony.",
-        fact: "The Taijitu. It represents the dualistic nature of the universe, where opposite forces are interconnected.",
-        shape: (() => {
-            const points: Point[] = [];
-            // Outer Circle
-            for (let i = 0; i <= 60; i++) {
-                const ang = i * 2 * Math.PI / 60;
-                points.push({ x: 0.5 + 0.35 * Math.cos(ang), y: 0.5 + 0.35 * Math.sin(ang) });
-            }
-            // S-Curve
-            for (let i = 0; i <= 30; i++) {
-                const ang = -Math.PI / 2 + (i * Math.PI / 30);
-                points.push({ x: 0.5 + 0.175 * Math.cos(ang), y: 0.325 + 0.175 * Math.sin(ang) });
-            }
-            for (let i = 0; i <= 30; i++) {
-                const ang = Math.PI / 2 + (i * Math.PI / 30);
-                points.push({ x: 0.5 + 0.175 * Math.cos(ang), y: 0.675 + 0.175 * Math.sin(ang) });
-            }
-            return points;
-        })(),
+        name: "The Lotus",
+        description: "A geometric bloom.",
+        fact: "The lotus flower is a symbol of purity and enlightenment. Its geometry is often used in sacred patterns like the Mandala.",
+        shape: createParametric(
+            (t) => (1 + 0.25 * Math.sin(6 * t)) * Math.cos(t),
+            (t) => (1 + 0.25 * Math.sin(6 * t)) * Math.sin(t),
+            0.28, { x: 0.5, y: 0.5 }, 0, 2 * Math.PI
+        ),
         unlockScore: 92.0
     },
     {
@@ -608,14 +595,21 @@ const levels: Level[] = [
     },
     {
         id: 48,
-        name: "The Butterfly",
-        description: "The Chaos Theory.",
-        fact: "A complex transcendental plane curve discovered by Temple H. Fay. It exhibits high sensitivity to input.",
-        shape: createParametric(
-            (t) => Math.sin(t) * (Math.exp(Math.cos(t)) - 2 * Math.cos(4 * t) - Math.pow(Math.sin(t / 12), 5)),
-            (t) => Math.cos(t) * (Math.exp(Math.cos(t)) - 2 * Math.cos(4 * t) - Math.pow(Math.sin(t / 12), 5)),
-            0.1, { x: 0.5, y: 0.5 }, 0, 12 * Math.PI, 200
-        ),
+        name: "The Fan",
+        description: "Keep it cool.",
+        fact: "Hand fans have been used for thousands of years as symbols of status and tools for relief from heat.",
+        shape: (() => {
+            const points: Point[] = [];
+            const r = 0.4;
+            const cx = 0.5, cy = 0.8;
+            // Arc from -30 to -150 degrees
+            for (let i = 0; i <= 40; i++) {
+                const ang = (-30 * Math.PI / 180) - (i * 120 * Math.PI / 180 / 40);
+                points.push({ x: cx + r * Math.cos(ang), y: cy + r * Math.sin(ang) });
+            }
+            points.push({ x: cx, y: cy }, { x: cx + r * Math.cos(-30 * Math.PI / 180), y: cy + r * Math.sin(-30 * Math.PI / 180) });
+            return points;
+        })(),
         unlockScore: 92.0
     },
     {
