@@ -10,7 +10,7 @@ import levels from './lib/shapes';
 import { ArrowLeft, RefreshCcw, Info, X, Download } from 'lucide-react';
 import { useGlobalLeaderboard } from './hooks/useGlobalLeaderboard';
 
-const CURRENT_VERSION = '1.0.1';
+const CURRENT_VERSION = '1.0.2';
 const VERSION_CHECK_INTERVAL = 30 * 60 * 1000; // 30 minutes
 
 function App() {

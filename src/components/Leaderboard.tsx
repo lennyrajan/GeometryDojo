@@ -65,7 +65,7 @@ export const Leaderboard: React.FC<LeaderboardProps> = ({ players, activePlayerI
     const myStats = localRankings.find((r: any) => r.isMe);
 
     return (
-        <div className={`flex flex-col h-full overflow-hidden ${theme === 'space' ? 'bg-indigo-950 text-white' : 'bg-zinc-950 text-white'}`}>
+        <div className={`flex flex-col h-screen overflow-hidden ${theme === 'space' ? 'bg-indigo-950 text-white' : 'bg-zinc-950 text-white'}`}>
             {/* Header */}
             <div className="flex items-center gap-4 p-6 pb-2 shrink-0">
                 <button
