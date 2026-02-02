@@ -31,7 +31,7 @@ interface GameState {
 const generateId = () => `player-${Math.random().toString(36).substr(2, 9)}`;
 
 const defaultState: GameState = {
-    players: [{ id: generateId(), name: 'Student', scores: { easy: {}, medium: {}, hard: {} }, unlockedLevels: { easy: [1], medium: [1], hard: [1] } }],
+    players: [{ id: generateId(), name: '', scores: { easy: {}, medium: {}, hard: {} }, unlockedLevels: { easy: [1], medium: [1], hard: [1] } }],
     activePlayerId: '', // Will be set in the first player object
     difficulty: 'medium',
     theme: 'space',
