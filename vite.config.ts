@@ -7,21 +7,21 @@ export default defineConfig({
         react(),
         VitePWA({
             registerType: 'autoUpdate',
+            includeAssets: ['icon.png', 'og-image.png'],
             manifest: {
                 name: 'Geometry Dojo',
                 short_name: 'GeoDojo',
                 description: 'Master the art of perfect shapes.',
-                theme_color: '#ffffff',
+                theme_color: '#312e81', // indigo-900 (matches app)
+                background_color: '#09090b', // slate-950
+                display: 'standalone',
+                orientation: 'portrait',
                 icons: [
                     {
-                        src: 'pwa-192x192.png',
-                        sizes: '192x192',
-                        type: 'image/png'
-                    },
-                    {
-                        src: 'pwa-512x512.png',
-                        sizes: '512x512',
-                        type: 'image/png'
+                        src: 'icon.png',
+                        sizes: '1024x1024',
+                        type: 'image/png',
+                        purpose: 'any maskable'
                     }
                 ]
             }
