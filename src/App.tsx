@@ -34,12 +34,15 @@ function App() {
 
     const { submitGlobalScore, syncAllProfiles, loading: isSyncing } = useGlobalLeaderboard(difficulty, false);
 
+    const [hasSynced, setHasSynced] = useState(false);
+
     // Background Sync on Mount
     useEffect(() => {
-        if (allPlayers.length > 0) {
+        if (!hasSynced && allPlayers.length > 0) {
             syncAllProfiles(allPlayers);
+            setHasSynced(true);
         }
-    }, []); // Only once on mount
+    }, [allPlayers, hasSynced, syncAllProfiles]);
 
 
     const [currentLevel, setCurrentLevel] = useState<Level | null>(null);
