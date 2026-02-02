@@ -30,16 +30,9 @@ export const useGlobalLeaderboard = (difficulty: Difficulty, autoFetch: boolean 
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
-    const isConfigured = !!import.meta.env.VITE_FIREBASE_API_KEY;
-
     // REAL-TIME LISTENER
     useEffect(() => {
         if (!autoFetch) return;
-
-        if (!isConfigured) {
-            setError("Firebase configuration is missing on this device. Please check your .env file.");
-            return;
-        }
 
         setLoading(true);
         setError(null);

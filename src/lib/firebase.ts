@@ -2,13 +2,13 @@ import { initializeApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
 
 const firebaseConfig = {
-    apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
-    authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
-    projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
-    storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
-    messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
-    appId: import.meta.env.VITE_FIREBASE_APP_ID,
-    measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID
+    apiKey: "AIzaSyCbGaSdWOaIkPfsZkA0g8jAbjPQsIdXci4",
+    authDomain: "geometry-dojo.firebaseapp.com",
+    projectId: "geometry-dojo",
+    storageBucket: "geometry-dojo.firebasestorage.app",
+    messagingSenderId: "901652858388",
+    appId: "1:901652858388:web:0e9684d9820ec80c654901",
+    measurementId: "G-BHGK4RF5G7"
 };
 
 const app = initializeApp(firebaseConfig);

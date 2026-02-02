@@ -182,9 +182,7 @@ export const Leaderboard: React.FC<LeaderboardProps> = ({ players, activePlayerI
                             <p className="text-red-400 text-xs font-bold leading-relaxed">
                                 {error.includes('index')
                                     ? "Global rankings need a search index. Please see the setup guide."
-                                    : error.includes('configuration')
-                                        ? "Firebase keys are missing on this device. Did you copy the .env file?"
-                                        : "Failed to connect to the global dojo server."}
+                                    : "Failed to connect to the global dojo server."}
                             </p>
                         </div>
                         <button
