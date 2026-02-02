@@ -8,6 +8,7 @@ import { SettingsMenu } from './components/SettingsMenu';
 import { Level } from './lib/shapes';
 import levels from './lib/shapes';
 import { ArrowLeft, RefreshCcw, Info, X } from 'lucide-react';
+import { useGlobalLeaderboard } from './hooks/useGlobalLeaderboard';
 
 function App() {
 
@@ -27,8 +28,11 @@ function App() {
         activePlayer,
         deletePlayer,
         theme,
-        toggleTheme
+        toggleTheme,
+        getActivePlayerStats
     } = useGameStore();
+
+    const { submitGlobalScore } = useGlobalLeaderboard(difficulty, false);
 
 
     const [currentLevel, setCurrentLevel] = useState<Level | null>(null);
@@ -45,6 +49,14 @@ function App() {
     const handleLevelComplete = (score: number) => {
         if (currentLevel) {
             submitScore(currentLevel.id, score);
+
+            // Sync to global leaderboard
+            const stats = getActivePlayerStats(difficulty);
+            submitGlobalScore(activePlayer.id, activePlayer.name, difficulty, {
+                totalScore: stats.totalScore,
+                averageAccuracy: stats.averageAccuracy,
+                highestLevel: stats.highestLevel
+            });
         }
     };
 

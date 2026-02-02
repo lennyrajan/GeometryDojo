@@ -241,6 +241,24 @@ export const useGameStore = () => {
         deletePlayer,
         clearLeaderboard,
         factoryReset,
-        toggleTheme // Expose toggle action
+        toggleTheme,
+
+        // Aggregate Stats for Global Sync
+        getActivePlayerStats: (diff: Difficulty) => {
+            const scores = activePlayer.scores[diff];
+            const unlocked = activePlayer.unlockedLevels[diff];
+            const totalScore = Object.values(scores).reduce((a, b) => a + b, 0);
+            const completedCount = Object.keys(scores).length;
+            const averageAccuracy = completedCount > 0 ? totalScore / completedCount : 0;
+            const highestLevel = Math.max(...unlocked, 0);
+
+            return {
+                totalScore,
+                averageAccuracy,
+                highestLevel,
+                name: activePlayer.name,
+                id: activePlayer.id
+            };
+        }
     };
 };

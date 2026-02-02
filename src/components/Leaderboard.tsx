@@ -1,7 +1,8 @@
 import React, { useState, useMemo } from 'react';
-import { ArrowLeft, Globe, Medal, Trophy } from 'lucide-react';
+import { ArrowLeft, Globe, Medal, Trophy, Users, RefreshCw, Loader2 } from 'lucide-react';
 import { Difficulty } from '../types';
 import { PlayerProfile } from '../hooks/useGameStore';
+import { useGlobalLeaderboard } from '../hooks/useGlobalLeaderboard';
 
 interface LeaderboardProps {
     players: PlayerProfile[];
@@ -12,16 +13,19 @@ interface LeaderboardProps {
 }
 
 export const Leaderboard: React.FC<LeaderboardProps> = ({ players, activePlayerId, onBack, initialDifficulty, theme }) => {
+    const [viewType, setViewType] = useState<'local' | 'global'>('local');
     // Local state for viewing, disjoint from global game difficulty
     const [viewDifficulty, setViewDifficulty] = useState<Difficulty>(initialDifficulty);
 
-    // Calculate Rankings for the selected difficulty
-    const rankings = useMemo(() => {
-        return players.map((player: PlayerProfile) => {
-            const scores = player.scores[viewDifficulty];
-            const unlocked = player.unlockedLevels[viewDifficulty];
+    const { globalRankings, loading, refresh } = useGlobalLeaderboard(viewDifficulty);
 
-            const totalScore = Object.values(scores).reduce((a: number, b: number) => a + b, 0);
+    // Calculate LOCAL Rankings for the selected difficulty
+    const localRankings = useMemo(() => {
+        return players.map((player: PlayerProfile) => {
+            const scores = player.scores[viewDifficulty] as Record<number, number>;
+            const unlocked = player.unlockedLevels[viewDifficulty] as number[];
+
+            const totalScore: number = Object.values(scores).reduce((a: number, b: number) => a + b, 0);
             const completedCount = Object.keys(scores).length;
             const average = completedCount > 0 ? totalScore / completedCount : 0;
             const highestLevel = Math.max(...unlocked, 0);
@@ -43,8 +47,23 @@ export const Leaderboard: React.FC<LeaderboardProps> = ({ players, activePlayerI
             .map((p, index: number) => ({ ...p, rank: index + 1 }));
     }, [players, viewDifficulty, activePlayerId]);
 
+    // Format GLOBAL Rankings for UI
+    const formattedGlobalRankings = useMemo(() => {
+        return globalRankings.map((entry, index) => ({
+            id: entry.userId,
+            name: entry.userName,
+            average: entry.averageAccuracy,
+            highestLevel: entry.highestLevel,
+            totalScore: entry.totalScore,
+            isMe: entry.userId === activePlayerId,
+            rank: index + 1
+        }));
+    }, [globalRankings, activePlayerId]);
+
+    const activeRankings = viewType === 'local' ? localRankings : formattedGlobalRankings;
+
     // Current Player Stats
-    const myStats = rankings.find((r: any) => r.isMe);
+    const myStats = localRankings.find((r: any) => r.isMe);
 
     return (
         <div className={`flex flex-col h-full overflow-hidden ${theme === 'space' ? 'bg-indigo-950 text-white' : 'bg-zinc-950 text-white'}`}>
@@ -59,8 +78,33 @@ export const Leaderboard: React.FC<LeaderboardProps> = ({ players, activePlayerI
                 <h1 className="text-2xl font-bold">Hall of Fame</h1>
             </div>
 
-            {/* Difficulty Tabs */}
-            <div className="px-6 py-4">
+            {/* Mode & Difficulty Selector */}
+            <div className="px-6 py-4 space-y-4">
+                {/* View Type Toggle */}
+                <div className="flex p-1 bg-zinc-900/50 rounded-xl border border-white/5 backdrop-blur-sm">
+                    <button
+                        onClick={() => setViewType('local')}
+                        className={`flex-1 flex items-center justify-center gap-2 py-2 text-[10px] font-black uppercase tracking-[0.2em] rounded-lg transition-all ${viewType === 'local'
+                            ? 'bg-white text-black shadow-lg'
+                            : 'text-zinc-500 hover:text-zinc-300'
+                            }`}
+                    >
+                        <Users className="w-3 h-3" />
+                        Device
+                    </button>
+                    <button
+                        onClick={() => setViewType('global')}
+                        className={`flex-1 flex items-center justify-center gap-2 py-2 text-[10px] font-black uppercase tracking-[0.2em] rounded-lg transition-all ${viewType === 'global'
+                            ? 'bg-indigo-500 text-white shadow-lg shadow-indigo-500/20'
+                            : 'text-zinc-500 hover:text-zinc-300'
+                            }`}
+                    >
+                        <Globe className="w-3 h-3" />
+                        World
+                    </button>
+                </div>
+
+                {/* Difficulty Tabs */}
                 <div className="flex p-1 bg-zinc-900/50 rounded-xl border border-white/5 backdrop-blur-sm">
                     {(['easy', 'medium', 'hard'] as Difficulty[]).map(d => (
                         <button
@@ -109,54 +153,74 @@ export const Leaderboard: React.FC<LeaderboardProps> = ({ players, activePlayerI
                     </div>
                 )}
 
-                {/* Global List */}
-                <div className="flex items-center gap-2 mb-4">
-                    <Globe className="w-4 h-4 text-indigo-400" />
-                    <span className="text-[10px] font-black text-zinc-500 uppercase tracking-[0.2em]">Global Class Ranking ({viewDifficulty})</span>
-                </div>
-
-                <div className="space-y-4 pb-safe">
-                    {rankings.map((player) => (
-                        <div key={player.id} className={`flex items-center justify-between p-4 rounded-2xl border transition-all ${player.isMe
-                            ? 'bg-indigo-500/10 border-indigo-500/40 shadow-indigo-500/10'
-                            : 'bg-zinc-900/40 border-white/5'
-                            }`}>
-                            <div className="flex items-center gap-4">
-                                <span className={`
-                                    w-10 h-10 flex items-center justify-center rounded-xl font-black text-sm transition-transform
-                                    ${player.rank === 1 ? 'bg-yellow-500/20 text-yellow-500 scale-110 shadow-lg shadow-yellow-500/20' :
-                                        player.rank === 2 ? 'bg-zinc-400/20 text-zinc-300' :
-                                            player.rank === 3 ? 'bg-orange-700/20 text-orange-400' : 'bg-zinc-800/50 text-zinc-500'}
-                                `}>
-                                    {player.rank}
-                                </span>
-                                <div>
-                                    <span className={`font-bold block ${player.isMe ? 'text-white' : 'text-zinc-300'}`}>
-                                        {player.name}
-                                        {player.isMe && <span className="ml-2 text-[8px] bg-indigo-500 text-white px-1.5 py-0.5 rounded uppercase">You</span>}
-                                    </span>
-                                    <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">
-                                        Level {player.highestLevel} Reached
-                                    </span>
-                                </div>
-                            </div>
-                            <div className="text-right">
-                                <div className={`font-mono font-black text-xl ${player.average >= 95 ? 'text-green-400' :
-                                    player.average >= 90 ? 'text-yellow-400' : 'text-zinc-400'
-                                    }`}>
-                                    {player.average.toFixed(1)}%
-                                </div>
-                                <div className="text-[8px] text-zinc-600 font-bold uppercase tracking-tighter">Avg Accuracy</div>
-                            </div>
-                        </div>
-                    ))}
-
-                    {rankings.length === 0 && (
-                        <div className="py-20 text-center">
-                            <div className="text-zinc-700 text-xs font-bold uppercase tracking-widest">No entries recorded for this difficulty</div>
-                        </div>
+                {/* Global List Header */}
+                <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center gap-2">
+                        {viewType === 'local' ? <Users className="w-4 h-4 text-zinc-400" /> : <Globe className="w-4 h-4 text-indigo-400" />}
+                        <span className="text-[10px] font-black text-zinc-500 uppercase tracking-[0.2em]">
+                            {viewType === 'local' ? 'Local Players' : 'World Ranking'} ({viewDifficulty})
+                        </span>
+                    </div>
+                    {viewType === 'global' && (
+                        <button
+                            onClick={refresh}
+                            disabled={loading}
+                            className="p-1 hover:bg-white/5 rounded-full transition-colors text-zinc-500 hover:text-white"
+                        >
+                            <RefreshCw className={`w-3 h-3 ${loading ? 'animate-spin' : ''}`} />
+                        </button>
                     )}
                 </div>
+
+                {loading ? (
+                    <div className="flex flex-col items-center justify-center py-20 gap-4">
+                        <Loader2 className="w-8 h-8 text-indigo-500 animate-spin" />
+                        <span className="text-[10px] font-black text-zinc-600 uppercase tracking-widest">Accessing Dojos...</span>
+                    </div>
+                ) : (
+                    <div className="space-y-4 pb-safe">
+                        {activeRankings.map((player) => (
+                            <div key={player.id} className={`flex items-center justify-between p-4 rounded-2xl border transition-all ${player.isMe
+                                ? 'bg-indigo-500/10 border-indigo-500/40 shadow-indigo-500/10'
+                                : 'bg-zinc-900/40 border-white/5'
+                                }`}>
+                                <div className="flex items-center gap-4">
+                                    <span className={`
+                                        w-10 h-10 flex items-center justify-center rounded-xl font-black text-sm transition-transform
+                                        ${player.rank === 1 ? 'bg-yellow-500/20 text-yellow-500 scale-110 shadow-lg shadow-yellow-500/20' :
+                                            player.rank === 2 ? 'bg-zinc-400/20 text-zinc-300' :
+                                                player.rank === 3 ? 'bg-orange-700/20 text-orange-400' : 'bg-zinc-800/50 text-zinc-500'}
+                                    `}>
+                                        {player.rank}
+                                    </span>
+                                    <div>
+                                        <span className={`font-bold block ${player.isMe ? 'text-white' : 'text-zinc-300'}`}>
+                                            {player.name}
+                                            {player.isMe && <span className="ml-2 text-[8px] bg-indigo-500 text-white px-1.5 py-0.5 rounded uppercase">You</span>}
+                                        </span>
+                                        <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">
+                                            Level {player.highestLevel} Reached
+                                        </span>
+                                    </div>
+                                </div>
+                                <div className="text-right">
+                                    <div className={`font-mono font-black text-xl ${player.average >= 95 ? 'text-green-400' :
+                                        player.average >= 90 ? 'text-yellow-400' : 'text-zinc-400'
+                                        }`}>
+                                        {player.average.toFixed(1)}%
+                                    </div>
+                                    <div className="text-[8px] text-zinc-600 font-bold uppercase tracking-tighter">Avg Accuracy</div>
+                                </div>
+                            </div>
+                        ))}
+
+                        {activeRankings.length === 0 && (
+                            <div className="py-20 text-center">
+                                <div className="text-zinc-700 text-xs font-bold uppercase tracking-widest">No entries recorded for this difficulty</div>
+                            </div>
+                        )}
+                    </div>
+                )}
             </div>
         </div>
     );
