@@ -85,7 +85,7 @@ function App() {
         }, 1000);
 
         return () => clearTimeout(timeout);
-    }, [activeStats.totalScore, activeStats.highestLevel, activePlayer?.id, difficulty]);
+    }, [activeStats.totalScore, activeStats.highestLevel, activePlayer?.id, activePlayer?.name, difficulty]);
 
 
     const [currentLevel, setCurrentLevel] = useState<Level | null>(null);

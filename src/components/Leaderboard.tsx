@@ -63,8 +63,18 @@ export const Leaderboard: React.FC<LeaderboardProps> = ({ players, activePlayerI
 
     // Current Player Stats (Dynamic based on View Type)
     const myStats = useMemo(() => {
-        return activeRankings.find((r: any) => r.isMe);
-    }, [activeRankings]);
+        const found = activeRankings.find((r: any) => r.isMe);
+        if (found) return found;
+
+        // If in World view but not in Top 100, show local performance with "100+" rank
+        if (viewType === 'global') {
+            const localMe = localRankings.find(r => r.isMe);
+            if (localMe) {
+                return { ...localMe, rank: '100+' };
+            }
+        }
+        return null;
+    }, [activeRankings, viewType, localRankings]);
 
     return (
         <div className={`flex flex-col h-screen overflow-hidden ${theme === 'space' ? 'bg-indigo-950 text-white' : 'bg-zinc-950 text-white'}`}>
