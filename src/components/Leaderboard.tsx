@@ -120,10 +120,10 @@ export const Leaderboard: React.FC<LeaderboardProps> = ({ players, activePlayerI
                 </div>
             </div>
 
-            <div className="flex-1 overflow-y-auto px-6 pb-6 custom-scrollbar">
-                {/* User Stats Card */}
+            <div className="px-6 pb-2 shrink-0">
+                {/* User Stats Card - Fixed at top of list area */}
                 {myStats && (
-                    <div className={`rounded-2xl p-6 mb-8 border transition-all duration-500 ${viewDifficulty === 'easy' ? 'bg-green-500/5 border-green-500/20' :
+                    <div className={`rounded-2xl p-6 mb-4 border transition-all duration-500 ${viewDifficulty === 'easy' ? 'bg-green-500/5 border-green-500/20' :
                         viewDifficulty === 'medium' ? 'bg-yellow-500/5 border-yellow-500/20' :
                             'bg-red-500/5 border-red-500/20'
                         } shrink-0 shadow-2xl relative overflow-hidden group`}>
@@ -152,7 +152,7 @@ export const Leaderboard: React.FC<LeaderboardProps> = ({ players, activePlayerI
                     </div>
                 )}
 
-                {/* Global List Header */}
+                {/* Global List Header - Fixed */}
                 <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center gap-2">
                         {viewType === 'local' ? <Users className="w-4 h-4 text-zinc-400" /> : <Globe className="w-4 h-4 text-indigo-400" />}
@@ -170,6 +170,10 @@ export const Leaderboard: React.FC<LeaderboardProps> = ({ players, activePlayerI
                         </button>
                     )}
                 </div>
+            </div>
+
+            {/* Scrollable Rankings List */}
+            <div className="flex-1 overflow-y-auto px-6 pb-6 min-h-0 custom-scrollbar-minimal">
 
                 {(viewType === 'global' && loading) ? (
                     <div className="flex flex-col items-center justify-center py-20 gap-4">

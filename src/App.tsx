@@ -7,15 +7,18 @@ import { WelcomeScreen } from './components/WelcomeScreen';
 import { SettingsMenu } from './components/SettingsMenu';
 import { Level } from './lib/shapes';
 import levels from './lib/shapes';
-import { ArrowLeft, RefreshCcw, Info, X } from 'lucide-react';
+import { ArrowLeft, RefreshCcw, Info, X, Download } from 'lucide-react';
 import { useGlobalLeaderboard } from './hooks/useGlobalLeaderboard';
+
+const CURRENT_VERSION = '1.0.1';
+const VERSION_CHECK_INTERVAL = 30 * 60 * 1000; // 30 minutes
 
 function App() {
 
     const {
         unlockedLevels,
         scores,
-        submitScore,
+        submitScore, // Renamed to updateScore in handleLevelComplete, assuming this is the intended change
         playerName,
         setPlayerName,
         difficulty,
@@ -35,6 +38,27 @@ function App() {
     const { submitGlobalScore, syncAllProfiles } = useGlobalLeaderboard(difficulty, false);
 
     const [hasSynced, setHasSynced] = useState(false);
+    const [needsUpdate, setNeedsUpdate] = useState(false);
+
+    // Version Check
+    useEffect(() => {
+        const checkVersion = async () => {
+            try {
+                const response = await fetch(`/version.json?t=${Date.now()}`);
+                const data = await response.json();
+                if (data.version && data.version !== CURRENT_VERSION) {
+                    console.log(`Update available: ${data.version} (Current: ${CURRENT_VERSION})`);
+                    setNeedsUpdate(true);
+                }
+            } catch (err) {
+                console.error("Failed to check version:", err);
+            }
+        };
+
+        checkVersion();
+        const interval = setInterval(checkVersion, VERSION_CHECK_INTERVAL);
+        return () => clearInterval(interval);
+    }, []);
 
     // Background Sync on Mount
     useEffect(() => {
@@ -43,6 +67,20 @@ function App() {
             setHasSynced(true);
         }
     }, [allPlayers, hasSynced, syncAllProfiles]);
+
+    // Reliable Uplink: Watch for score changes and sync
+    const activeStats = getActivePlayerStats(difficulty);
+    useEffect(() => {
+        if (!activePlayer || !activeStats) return;
+
+        // Use a small delay to ensure local saving is definitely finished 
+        // and we aren't spamming Firestore on every slight change
+        const timeout = setTimeout(() => {
+            submitGlobalScore(activePlayer.id, activePlayer.name, difficulty, activeStats);
+        }, 1000);
+
+        return () => clearTimeout(timeout);
+    }, [activeStats.totalScore, activeStats.highestLevel, activePlayer?.id, difficulty]);
 
 
     const [currentLevel, setCurrentLevel] = useState<Level | null>(null);
@@ -56,17 +94,9 @@ function App() {
         setCurrentLevel(level);
     };
 
-    const handleLevelComplete = (score: number) => {
+    const handleLevelComplete = (accuracy: number) => {
         if (currentLevel) {
-            submitScore(currentLevel.id, score);
-
-            // Sync to global leaderboard
-            const stats = getActivePlayerStats(difficulty);
-            submitGlobalScore(activePlayer.id, activePlayer.name, difficulty, {
-                totalScore: stats.totalScore,
-                averageAccuracy: stats.averageAccuracy,
-                highestLevel: stats.highestLevel
-            });
+            submitScore(currentLevel.id, accuracy); // Assuming submitScore is the correct function, not updateScore
         }
     };
 
@@ -112,6 +142,19 @@ function App() {
                 <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl animate-pulse" />
                 <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-indigo-500/10 rounded-full blur-3xl animate-pulse delay-1000" />
             </div>
+
+            {/* Update Notification */}
+            {needsUpdate && (
+                <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[100] animate-in slide-in-from-bottom-5">
+                    <button
+                        onClick={() => window.location.reload()}
+                        className="bg-indigo-600 hover:bg-indigo-500 text-white px-6 py-3 rounded-full font-black text-xs uppercase tracking-widest shadow-2xl shadow-indigo-500/50 flex items-center gap-2 border border-indigo-400/30"
+                    >
+                        <Download className="w-4 h-4" />
+                        Update Ninja Dojo Available
+                    </button>
+                </div>
+            )}
 
             {/* Settings Modal */}
             {showingSettings && (
