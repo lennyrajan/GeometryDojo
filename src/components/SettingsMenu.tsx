@@ -213,25 +213,25 @@ export const SettingsMenu: React.FC<SettingsMenuProps> = ({
                         <h3 className="text-xs font-medium opacity-60 mb-2 uppercase tracking-wider">Data Management</h3>
                         <div className="flex flex-col gap-2">
                             <button
-                                onClick={() => confirmAction("Are you sure you want to clear your scores for this difficulty?", onClearLeaderboard)}
+                                onClick={() => confirmAction("Are you sure you want to clear your device scores for this difficulty? Your World High Scores will NO be affected.", onClearLeaderboard)}
                                 className="flex items-center justify-between w-full p-3 bg-zinc-900 border border-zinc-800 rounded-lg hover:bg-zinc-800 transition-colors group"
                             >
                                 <div className="flex items-center gap-2">
                                     <Trash2 className="w-4 h-4 text-zinc-400" />
-                                    <span className="font-medium text-sm text-zinc-300">Clear Current Scores</span>
+                                    <span className="font-medium text-sm text-zinc-300">Clear Device Scores</span>
                                 </div>
-                                <span className="text-[10px] text-zinc-600 group-hover:text-zinc-500">Reset Leaderboard</span>
+                                <span className="text-[10px] text-zinc-600 group-hover:text-zinc-500">Local Only</span>
                             </button>
 
                             <button
-                                onClick={() => confirmAction("WARNING: This will wipe ALL players and data. Cannot be undone.", onFactoryReset)}
+                                onClick={() => confirmAction("DANGER: This will wipe ALL players and local data. Your World High Scores will remain safe, but local history will be gone.", onFactoryReset)}
                                 className="flex items-center justify-between w-full p-3 bg-red-950/20 border border-red-900/30 rounded-lg hover:bg-red-900/40 transition-colors group"
                             >
                                 <div className="flex items-center gap-2">
                                     <Monitor className="w-4 h-4 text-red-500" />
-                                    <span className="font-medium text-sm text-red-500">Factory Reset</span>
+                                    <span className="font-medium text-sm text-red-500">Complete Local Wipe</span>
                                 </div>
-                                <span className="text-[10px] text-red-500/60 group-hover:text-red-500">Wipe Everything</span>
+                                <span className="text-[10px] text-red-500/60 group-hover:text-red-500">Device Only</span>
                             </button>
                         </div>
                     </div>

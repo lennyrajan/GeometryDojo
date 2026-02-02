@@ -73,6 +73,11 @@ function App() {
     useEffect(() => {
         if (!activePlayer || !activeStats) return;
 
+        // PROTECTION: If local scores are wiped (totalScore is 0), 
+        // DO NOT push this to the world leaderboard. 
+        // This keeps the user's global high score safe even after a local reset.
+        if (activeStats.totalScore === 0) return;
+
         // Use a small delay to ensure local saving is definitely finished 
         // and we aren't spamming Firestore on every slight change
         const timeout = setTimeout(() => {
