@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Settings, X, Trash2, Monitor, Swords, User, Plus, Check } from 'lucide-react';
+import { Settings, X, Trash2, Monitor, Swords, User, Plus, Check, Globe } from 'lucide-react';
 import { Difficulty } from '../types';
 import { PlayerProfile } from '../hooks/useGameStore';
 
@@ -16,11 +16,14 @@ interface SettingsMenuProps {
     onDeletePlayer: (id: string) => void;
     theme: 'space' | 'classic';
     toggleTheme: () => void;
+    onSyncData?: () => void;
+    isSyncing?: boolean;
 }
 
 export const SettingsMenu: React.FC<SettingsMenuProps> = ({
     currentDifficulty, onSetDifficulty, onClose, onClearLeaderboard, onFactoryReset,
-    players, activePlayerId, onAddPlayer, onSwitchPlayer, onDeletePlayer, theme, toggleTheme
+    players, activePlayerId, onAddPlayer, onSwitchPlayer, onDeletePlayer, theme, toggleTheme,
+    onSyncData, isSyncing
 }) => {
 
     const [isAddingUser, setIsAddingUser] = useState(false);
@@ -233,6 +236,20 @@ export const SettingsMenu: React.FC<SettingsMenuProps> = ({
                                 </div>
                                 <span className="text-[10px] text-red-500/60 group-hover:text-red-500">Wipe Everything</span>
                             </button>
+
+                            {onSyncData && (
+                                <button
+                                    onClick={onSyncData}
+                                    disabled={isSyncing}
+                                    className="flex items-center justify-between w-full p-3 bg-indigo-950/20 border border-indigo-900/30 rounded-lg hover:bg-indigo-900/40 transition-colors group disabled:opacity-50"
+                                >
+                                    <div className="flex items-center gap-2">
+                                        <Globe className={`w-4 h-4 text-indigo-500 ${isSyncing ? 'animate-spin' : ''}`} />
+                                        <span className="font-medium text-sm text-indigo-500">{isSyncing ? 'Syncing...' : 'Sync All to World'}</span>
+                                    </div>
+                                    <span className="text-[10px] text-indigo-500/60 group-hover:text-indigo-500">Push Local Data</span>
+                                </button>
+                            )}
                         </div>
                     </div>
                 </div>

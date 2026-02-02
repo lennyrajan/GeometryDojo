@@ -32,7 +32,7 @@ function App() {
         getActivePlayerStats
     } = useGameStore();
 
-    const { submitGlobalScore } = useGlobalLeaderboard(difficulty, false);
+    const { submitGlobalScore, syncAllProfiles, loading: isSyncing } = useGlobalLeaderboard(difficulty, false);
 
 
     const [currentLevel, setCurrentLevel] = useState<Level | null>(null);
@@ -124,6 +124,8 @@ function App() {
                     onDeletePlayer={deletePlayer}
                     theme={theme}
                     toggleTheme={toggleTheme}
+                    onSyncData={() => syncAllProfiles(allPlayers)}
+                    isSyncing={isSyncing}
                 />
             )}
 

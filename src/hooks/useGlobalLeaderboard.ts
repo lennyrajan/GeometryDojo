@@ -73,6 +73,7 @@ export const useGlobalLeaderboard = (difficulty: Difficulty, autoFetch: boolean 
         difficulty: Difficulty,
         stats: { totalScore: number; averageAccuracy: number; highestLevel: number }
     ) => {
+        if (!userId || !userName) return;
         try {
             const scoreId = `${userId}_${difficulty}`;
             const scoreRef = doc(db, 'global_scores', scoreId);
@@ -86,11 +87,44 @@ export const useGlobalLeaderboard = (difficulty: Difficulty, autoFetch: boolean 
                 highestLevel: stats.highestLevel,
                 lastUpdated: serverTimestamp()
             }, { merge: true });
-
-            // Optionally refresh rankings if we are on the same difficulty
-            // fetchRankings(); 
         } catch (err) {
             console.error("Error submitting global score:", err);
+        }
+    };
+
+    const syncAllProfiles = async (players: any[]) => {
+        setLoading(true);
+        try {
+            const difficulties: Difficulty[] = ['easy', 'medium', 'hard'];
+            for (const player of players) {
+                if (!player.name) continue;
+
+                for (const diff of difficulties) {
+                    const scores = player.scores[diff];
+                    const unlocked = player.unlockedLevels[diff];
+
+                    const scoreValues = Object.values(scores) as number[];
+                    if (scoreValues.length === 0 && Math.max(...unlocked, 0) === 0) continue;
+
+                    const totalScore = scoreValues.reduce((a, b) => a + b, 0);
+                    const completedCount = scoreValues.length;
+                    const averageAccuracy = completedCount > 0 ? totalScore / completedCount : 0;
+                    const highestLevel = Math.max(...unlocked, 0);
+
+                    if (highestLevel > 0 || averageAccuracy > 0) {
+                        await submitGlobalScore(player.id, player.name, diff, {
+                            totalScore,
+                            averageAccuracy,
+                            highestLevel
+                        });
+                    }
+                }
+            }
+            fetchRankings();
+        } catch (err) {
+            console.error("Sync failed:", err);
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -99,6 +133,7 @@ export const useGlobalLeaderboard = (difficulty: Difficulty, autoFetch: boolean 
         loading,
         error,
         refresh: fetchRankings,
-        submitGlobalScore
+        submitGlobalScore,
+        syncAllProfiles
     };
 };
