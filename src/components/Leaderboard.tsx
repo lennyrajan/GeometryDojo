@@ -61,8 +61,10 @@ export const Leaderboard: React.FC<LeaderboardProps> = ({ players, activePlayerI
 
     const activeRankings = viewType === 'local' ? localRankings : formattedGlobalRankings;
 
-    // Current Player Stats
-    const myStats = localRankings.find((r: any) => r.isMe);
+    // Current Player Stats (Dynamic based on View Type)
+    const myStats = useMemo(() => {
+        return activeRankings.find((r: any) => r.isMe);
+    }, [activeRankings]);
 
     return (
         <div className={`flex flex-col h-screen overflow-hidden ${theme === 'space' ? 'bg-indigo-950 text-white' : 'bg-zinc-950 text-white'}`}>
