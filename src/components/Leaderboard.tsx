@@ -14,10 +14,9 @@ interface LeaderboardProps {
 
 export const Leaderboard: React.FC<LeaderboardProps> = ({ players, activePlayerId, onBack, initialDifficulty, theme }) => {
     const [viewType, setViewType] = useState<'local' | 'global'>('local');
-    // Local state for viewing, disjoint from global game difficulty
     const [viewDifficulty, setViewDifficulty] = useState<Difficulty>(initialDifficulty);
 
-    const { globalRankings, loading, refresh } = useGlobalLeaderboard(viewDifficulty);
+    const { globalRankings, loading, error, refresh } = useGlobalLeaderboard(viewDifficulty);
 
     // Calculate LOCAL Rankings for the selected difficulty
     const localRankings = useMemo(() => {
@@ -176,6 +175,22 @@ export const Leaderboard: React.FC<LeaderboardProps> = ({ players, activePlayerI
                     <div className="flex flex-col items-center justify-center py-20 gap-4">
                         <Loader2 className="w-8 h-8 text-indigo-500 animate-spin" />
                         <span className="text-[10px] font-black text-zinc-600 uppercase tracking-widest">Accessing Dojos...</span>
+                    </div>
+                ) : error ? (
+                    <div className="py-10 px-6 text-center space-y-4">
+                        <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-4">
+                            <p className="text-red-400 text-xs font-bold leading-relaxed">
+                                {error.includes('index')
+                                    ? "Global rankings need a search index. Please see the setup guide."
+                                    : "Failed to connect to the global dojo server."}
+                            </p>
+                        </div>
+                        <button
+                            onClick={refresh}
+                            className="text-[10px] font-black text-indigo-400 uppercase tracking-widest hover:text-white transition-colors"
+                        >
+                            Try Again
+                        </button>
                     </div>
                 ) : (
                     <div className="space-y-4 pb-safe">
