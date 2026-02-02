@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useGameStore } from './hooks/useGameStore';
 import { LevelGrid } from './components/LevelGrid';
 import { CanvasBoard } from './components/CanvasBoard';
@@ -33,6 +33,13 @@ function App() {
     } = useGameStore();
 
     const { submitGlobalScore, syncAllProfiles, loading: isSyncing } = useGlobalLeaderboard(difficulty, false);
+
+    // Background Sync on Mount
+    useEffect(() => {
+        if (allPlayers.length > 0) {
+            syncAllProfiles(allPlayers);
+        }
+    }, []); // Only once on mount
 
 
     const [currentLevel, setCurrentLevel] = useState<Level | null>(null);

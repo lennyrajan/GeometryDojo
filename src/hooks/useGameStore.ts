@@ -88,7 +88,20 @@ export const useGameStore = () => {
 
             // Ensure theme exists for existing v1 data
             if (!parsed.theme) parsed.theme = 'space';
-            return { ...defaultState, ...parsed };
+
+            // Fix legacy/generic player-1 IDs to be unique for global leaderboard
+            const fixedState = { ...defaultState, ...parsed };
+            fixedState.players = fixedState.players.map((p: PlayerProfile) => {
+                if (p.id === 'player-1') {
+                    return { ...p, id: `player-${Math.random().toString(36).substr(2, 9)}` };
+                }
+                return p;
+            });
+            if (fixedState.activePlayerId === 'player-1' && fixedState.players.length > 0) {
+                fixedState.activePlayerId = fixedState.players[0].id;
+            }
+
+            return fixedState;
 
         } catch (e) {
             console.error('Failed to load game state:', e);

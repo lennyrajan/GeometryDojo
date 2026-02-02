@@ -171,12 +171,12 @@ export const Leaderboard: React.FC<LeaderboardProps> = ({ players, activePlayerI
                     )}
                 </div>
 
-                {loading ? (
+                {(viewType === 'global' && loading) ? (
                     <div className="flex flex-col items-center justify-center py-20 gap-4">
                         <Loader2 className="w-8 h-8 text-indigo-500 animate-spin" />
                         <span className="text-[10px] font-black text-zinc-600 uppercase tracking-widest">Accessing Dojos...</span>
                     </div>
-                ) : error ? (
+                ) : (viewType === 'global' && error) ? (
                     <div className="py-10 px-6 text-center space-y-4">
                         <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-4">
                             <p className="text-red-400 text-xs font-bold leading-relaxed">
