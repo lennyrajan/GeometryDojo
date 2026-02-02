@@ -28,19 +28,17 @@ interface GameState {
     theme: 'space' | 'classic';
 }
 
-const defaultPlayer: PlayerProfile = {
-    id: 'player-1',
-    name: '', // Empty name triggers Welcome Screen
-    scores: { easy: {}, medium: {}, hard: {} },
-    unlockedLevels: { easy: [1], medium: [1], hard: [1] }
-};
+const generateId = () => `player-${Math.random().toString(36).substr(2, 9)}`;
 
 const defaultState: GameState = {
-    players: [defaultPlayer],
-    activePlayerId: 'player-1',
+    players: [{ id: generateId(), name: 'Student', scores: { easy: {}, medium: {}, hard: {} }, unlockedLevels: { easy: [1], medium: [1], hard: [1] } }],
+    activePlayerId: '', // Will be set in the first player object
     difficulty: 'medium',
-    theme: 'space'
+    theme: 'space',
 };
+
+// Fix activePlayerId in default state
+defaultState.activePlayerId = defaultState.players[0].id;
 
 export const useGameStore = () => {
     const [state, setState] = useState<GameState>(() => {
