@@ -25,6 +25,8 @@ export interface GlobalScoreEntry {
     lastUpdated: Timestamp;
 }
 
+const RESTRICTED_USERS = ['mastermad'];
+
 export const useGlobalLeaderboard = (difficulty: Difficulty, autoFetch: boolean = true) => {
     const [globalRankings, setGlobalRankings] = useState<GlobalScoreEntry[]>([]);
     const [loading, setLoading] = useState(false);
@@ -47,10 +49,12 @@ export const useGlobalLeaderboard = (difficulty: Difficulty, autoFetch: boolean 
             );
 
             const unsubscribe = onSnapshot(q, (snapshot) => {
-                const rankings = snapshot.docs.map(doc => ({
-                    ...doc.data(),
-                    id: doc.id
-                } as GlobalScoreEntry));
+                const rankings = snapshot.docs
+                    .map(doc => ({
+                        ...doc.data(),
+                        id: doc.id
+                    } as GlobalScoreEntry))
+                    .filter(entry => !RESTRICTED_USERS.includes(entry.userName.toLowerCase().trim()));
                 setGlobalRankings(rankings);
                 setLoading(false);
             }, (err) => {
@@ -74,6 +78,10 @@ export const useGlobalLeaderboard = (difficulty: Difficulty, autoFetch: boolean 
         stats: { totalScore: number; averageAccuracy: number; highestLevel: number }
     ) => {
         if (!userId || !userName) return;
+        if (RESTRICTED_USERS.includes(userName.toLowerCase().trim())) {
+            console.log(`Submission blocked for restricted user: ${userName}`);
+            return;
+        }
         try {
             const scoreId = `${userId}_${difficulty}`;
             const scoreRef = doc(db, 'global_scores', scoreId);
