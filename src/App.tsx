@@ -10,7 +10,7 @@ import levels from './lib/shapes';
 import { ArrowLeft, RefreshCcw, Info, X, Download } from 'lucide-react';
 import { useGlobalLeaderboard } from './hooks/useGlobalLeaderboard';
 
-const CURRENT_VERSION = '3.0.1';
+const CURRENT_VERSION = '3.0.2';
 const VERSION_CHECK_INTERVAL = 30 * 60 * 1000; // 30 minutes
 
 function App() {
@@ -152,11 +152,14 @@ function App() {
             {needsUpdate && (
                 <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[100] animate-in slide-in-from-bottom-5">
                     <button
-                        onClick={() => window.location.reload()}
+                        onClick={() => {
+                            setNeedsUpdate(false);
+                            window.location.reload();
+                        }}
                         className="bg-indigo-600 hover:bg-indigo-500 text-white px-6 py-3 rounded-full font-black text-xs uppercase tracking-widest shadow-2xl shadow-indigo-500/50 flex items-center gap-2 border border-indigo-400/30"
                     >
                         <Download className="w-4 h-4" />
-                        Update Ninja Dojo Available
+                        Update Available for Geometry Dojo
                     </button>
                 </div>
             )}
