@@ -27,4 +27,17 @@ export default defineConfig({
             }
         })
     ],
+    build: {
+        rollupOptions: {
+            output: {
+                manualChunks: {
+                    'vendor-react': ['react', 'react-dom'],
+                    'vendor-firebase': ['firebase/app', 'firebase/firestore'],
+                    'vendor-framer': ['framer-motion'],
+                    'vendor-ui': ['lucide-react', 'clsx', 'tailwind-merge']
+                }
+            }
+        },
+        chunkSizeWarningLimit: 1000
+    }
 })

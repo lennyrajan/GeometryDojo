@@ -1,14 +1,19 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, lazy, Suspense } from 'react';
 import { useGameStore } from './hooks/useGameStore';
 import { LevelGrid } from './components/LevelGrid';
 import { CanvasBoard } from './components/CanvasBoard';
-import { Leaderboard } from './components/Leaderboard';
+// import { Leaderboard } from './components/Leaderboard';
 import { WelcomeScreen } from './components/WelcomeScreen';
-import { SettingsMenu } from './components/SettingsMenu';
+// import { SettingsMenu } from './components/SettingsMenu';
+import { LoadingSpinner } from './components/LoadingSpinner';
 import { Level } from './lib/shapes';
 import levels from './lib/shapes';
 import { ArrowLeft, RefreshCcw, Info, X, Download } from 'lucide-react';
 import { useGlobalLeaderboard } from './hooks/useGlobalLeaderboard';
+
+// Lazy load components that aren't needed for the initial render
+const Leaderboard = lazy(() => import('./components/Leaderboard').then(module => ({ default: module.Leaderboard })));
+const SettingsMenu = lazy(() => import('./components/SettingsMenu').then(module => ({ default: module.SettingsMenu })));
 
 const CURRENT_VERSION = '3.0.2';
 const VERSION_CHECK_INTERVAL = 30 * 60 * 1000; // 30 minutes
@@ -128,13 +133,15 @@ function App() {
     // 2. Leaderboard View
     if (viewingLeaderboard) {
         return (
-            <Leaderboard
-                players={allPlayers}
-                activePlayerId={activePlayer.id}
-                onBack={() => setViewingLeaderboard(false)}
-                initialDifficulty={difficulty}
-                theme={theme}
-            />
+            <Suspense fallback={<LoadingSpinner />}>
+                <Leaderboard
+                    players={allPlayers}
+                    activePlayerId={activePlayer.id}
+                    onBack={() => setViewingLeaderboard(false)}
+                    initialDifficulty={difficulty}
+                    theme={theme}
+                />
+            </Suspense>
         );
     }
 
@@ -166,26 +173,28 @@ function App() {
 
             {/* Settings Modal */}
             {showingSettings && (
-                <SettingsMenu
-                    currentDifficulty={difficulty}
-                    onSetDifficulty={setDifficulty}
-                    onClose={() => setShowingSettings(false)}
-                    onClearLeaderboard={() => {
-                        clearLeaderboard();
-                        setShowingSettings(false);
-                    }}
-                    onFactoryReset={() => {
-                        factoryReset();
-                        setShowingSettings(false);
-                    }}
-                    players={allPlayers}
-                    activePlayerId={activePlayer.id}
-                    onAddPlayer={addPlayer}
-                    onSwitchPlayer={switchPlayer}
-                    onDeletePlayer={deletePlayer}
-                    theme={theme}
-                    toggleTheme={toggleTheme}
-                />
+                <Suspense fallback={<LoadingSpinner />}>
+                    <SettingsMenu
+                        currentDifficulty={difficulty}
+                        onSetDifficulty={setDifficulty}
+                        onClose={() => setShowingSettings(false)}
+                        onClearLeaderboard={() => {
+                            clearLeaderboard();
+                            setShowingSettings(false);
+                        }}
+                        onFactoryReset={() => {
+                            factoryReset();
+                            setShowingSettings(false);
+                        }}
+                        players={allPlayers}
+                        activePlayerId={activePlayer.id}
+                        onAddPlayer={addPlayer}
+                        onSwitchPlayer={switchPlayer}
+                        onDeletePlayer={deletePlayer}
+                        theme={theme}
+                        toggleTheme={toggleTheme}
+                    />
+                </Suspense>
             )}
 
             {/* Consolidated Game Header (Only in Level) */}
