@@ -15,7 +15,7 @@ import { useGlobalLeaderboard } from './hooks/useGlobalLeaderboard';
 const Leaderboard = lazy(() => import('./components/Leaderboard').then(module => ({ default: module.Leaderboard })));
 const SettingsMenu = lazy(() => import('./components/SettingsMenu').then(module => ({ default: module.SettingsMenu })));
 
-const CURRENT_VERSION = '3.0.2';
+const CURRENT_VERSION = '3.1.0';
 const VERSION_CHECK_INTERVAL = 30 * 60 * 1000; // 30 minutes
 
 function App() {
@@ -210,7 +210,14 @@ function App() {
                         </button>
                         <div className="hidden md:flex items-center gap-2 px-3 py-1.5 bg-black/40 backdrop-blur rounded-full border border-white/5">
                             <div className="w-2 h-2 rounded-full bg-indigo-500 animate-pulse" />
-                            <span className="text-xs font-bold text-indigo-200 uppercase tracking-wider">{playerName}</span>
+                            <span className="text-xs font-bold text-indigo-200 uppercase tracking-wider">
+                                {(() => {
+                                    const hour = new Date().getHours();
+                                    if (hour < 12) return 'Good Morning';
+                                    if (hour < 18) return 'Good Afternoon';
+                                    return 'Good Evening';
+                                })()} {playerName}
+                            </span>
                         </div>
                     </div>
 

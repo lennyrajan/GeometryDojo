@@ -108,7 +108,7 @@ export const LevelGrid: React.FC<LevelGridProps> = ({
                 </div>
 
                 <div className="flex items-center gap-4">
-                    <div className="hidden sm:flex flex-col items-end">
+                    <div className="flex flex-col items-end">
                         <span className="text-[10px] font-black text-indigo-400 uppercase tracking-[0.2em] opacity-70">
                             {greeting}
                         </span>
