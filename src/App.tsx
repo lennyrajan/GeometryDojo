@@ -15,7 +15,7 @@ import { useGlobalLeaderboard } from './hooks/useGlobalLeaderboard';
 const Leaderboard = lazy(() => import('./components/Leaderboard').then(module => ({ default: module.Leaderboard })));
 const SettingsMenu = lazy(() => import('./components/SettingsMenu').then(module => ({ default: module.SettingsMenu })));
 
-const CURRENT_VERSION = '3.1.2';
+const CURRENT_VERSION = '3.1.3';
 const VERSION_CHECK_INTERVAL = 30 * 60 * 1000; // 30 minutes
 
 function App() {
@@ -199,34 +199,35 @@ function App() {
 
             {/* Consolidated Game Header (Only in Level) */}
             {currentLevel && (
-                <div className="absolute top-0 left-0 right-0 z-40 p-4 flex items-center justify-between pointer-events-none">
+                <div className="absolute top-0 left-0 right-0 z-40 p-2 sm:p-4 flex items-center justify-between pointer-events-none">
 
-                    <div className="pointer-events-auto flex items-center gap-3">
+                    <div className="pointer-events-auto flex items-center gap-2">
                         <button
                             onClick={() => setCurrentLevel(null)}
-                            className="p-2 bg-black/40 backdrop-blur rounded-full text-white hover:bg-white/10 transition-colors border border-white/5"
+                            className="p-1.5 sm:p-2 bg-black/40 backdrop-blur rounded-full text-white hover:bg-white/10 transition-colors border border-white/5"
                         >
-                            <ArrowLeft className="w-5 h-5" />
+                            <ArrowLeft className="w-4 h-4 sm:w-5 h-5" />
                         </button>
-                        <div className="hidden md:flex items-center gap-2 px-3 py-1.5 bg-black/40 backdrop-blur rounded-full border border-white/5">
+                        <div className="hidden lg:flex items-center gap-2 px-3 py-1.5 bg-black/40 backdrop-blur rounded-full border border-white/5">
                             <div className="w-2 h-2 rounded-full bg-indigo-500 animate-pulse" />
                             <span className="text-xs font-bold text-indigo-200 uppercase tracking-wider">{playerName}</span>
                         </div>
                     </div>
 
-                    <div className="pointer-events-auto flex items-center gap-3 bg-black/40 backdrop-blur px-4 py-2 rounded-full border border-white/5 shadow-lg">
-                        <span className="text-white font-bold text-sm tracking-widest uppercase">
+                    <div className="pointer-events-auto flex items-center gap-2 sm:gap-3 bg-black/40 backdrop-blur px-3 sm:px-4 py-1.5 sm:py-2 rounded-full border border-white/5 shadow-lg max-w-[50%] sm:max-w-none">
+                        <span className="text-white font-bold text-[10px] sm:text-sm tracking-widest uppercase truncate">
                             {currentLevel.name}
                         </span>
-                        <div className="w-1 h-3 bg-white/20 rounded-full"></div>
-                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded uppercase ${difficulty === 'easy' ? 'bg-green-500/20 text-green-400' :
+                        <div className="w-px h-3 bg-white/20 rounded-full"></div>
+                        <span className={`text-[8px] sm:text-[10px] font-bold px-1.5 sm:px-2 py-0.5 rounded uppercase ${difficulty === 'easy' ? 'bg-green-500/20 text-green-400' :
                             difficulty === 'medium' ? 'bg-yellow-500/20 text-yellow-400' :
                                 'bg-red-500/20 text-red-400'
                             }`}>
-                            {difficulty}
+                            <span className="hidden sm:inline">{difficulty}</span>
+                            <span className="sm:hidden">{difficulty.charAt(0)}</span>
                         </span>
-                        <div className="w-1 h-3 bg-white/20 rounded-full"></div>
-                        <div className="flex items-center gap-2">
+                        <div className="hidden sm:block w-px h-3 bg-white/20 rounded-full"></div>
+                        <div className="hidden sm:flex items-center gap-2">
                             <span className="text-zinc-400 text-xs uppercase tracking-wider">Best:</span>
                             <span className="text-white font-mono font-bold">
                                 {scores[currentLevel.id]?.toFixed(1) || "0.0"}%
@@ -234,19 +235,19 @@ function App() {
                         </div>
                     </div>
 
-                    <div className="pointer-events-auto flex gap-2">
+                    <div className="pointer-events-auto flex gap-1.5 sm:gap-2">
                         <button
                             onClick={() => setShowFact(true)}
-                            className="p-2 bg-black/40 backdrop-blur rounded-full text-white hover:bg-white/10 transition-colors border border-white/5"
+                            className="p-1.5 sm:p-2 bg-black/40 backdrop-blur rounded-full text-white hover:bg-white/10 transition-colors border border-white/5"
                         >
-                            <Info className="w-5 h-5" />
+                            <Info className="w-4 h-4 sm:w-5 h-5" />
                         </button>
                         <button
                             onClick={() => setResetKey(k => k + 1)}
-                            className="p-2 bg-black/40 backdrop-blur rounded-full text-white hover:bg-white/10 transition-colors border border-white/5"
+                            className="p-1.5 sm:p-2 bg-black/40 backdrop-blur rounded-full text-white hover:bg-white/10 transition-colors border border-white/5"
                             title="Restart Level"
                         >
-                            <RefreshCcw className="w-5 h-5" />
+                            <RefreshCcw className="w-4 h-4 sm:w-5 h-5" />
                         </button>
                     </div>
                 </div>
