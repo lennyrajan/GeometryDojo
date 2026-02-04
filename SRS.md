@@ -43,3 +43,16 @@ The application provides a series of 80 levels, categorized by difficulty. It fe
 - **Physics/Math**: Custom geometry utility functions for distance and accuracy calculation.
 - **Backend/Database**: Firebase (for global leaderboard).
 - **Hosting**: Netlify.
+
+## 5. Design Constraints
+### 5.1 Single-Stroke Continuity
+All shapes in the game must satisfy the Eulerian path principle: they must be drawable in a single continuous stroke without the user needing to pick up their pen or mouse. This ensures a consistent gameplay experience and prevents "impossible" jumps in complex objects.
+
+### 5.2 Mobile Optimization
+Complex parametric shapes (Zen Master, Phoenix, etc.) must be scaled appropriately (typically 0.15 - 0.35 relative to center) to ensure they are legible and drawable on mobile viewports without excessive line congestion.
+
+## 6. Versioning
+The application uses semantic versioning to track updates and trigger cache refreshes for the Progressive Web App (PWA).
+
+- **Current Version**: 3.2.0
+- **Version Check**: Performed every 30 minutes to ensure players are on the latest build.

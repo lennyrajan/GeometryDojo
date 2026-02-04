@@ -15,7 +15,7 @@ import { useGlobalLeaderboard } from './hooks/useGlobalLeaderboard';
 const Leaderboard = lazy(() => import('./components/Leaderboard').then(module => ({ default: module.Leaderboard })));
 const SettingsMenu = lazy(() => import('./components/SettingsMenu').then(module => ({ default: module.SettingsMenu })));
 
-const CURRENT_VERSION = '3.1.3';
+const CURRENT_VERSION = '3.2.0';
 const VERSION_CHECK_INTERVAL = 30 * 60 * 1000; // 30 minutes
 
 function App() {
