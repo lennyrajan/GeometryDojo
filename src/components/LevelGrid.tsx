@@ -95,6 +95,15 @@ export const LevelGrid: React.FC<LevelGridProps> = ({
         <div className="p-4 h-full flex flex-col">
             <div className="flex justify-between items-center mb-6">
                 <div className="flex flex-col">
+                    <div className="flex items-center gap-2 mb-1 px-1">
+                        <span className="text-[9px] font-black text-indigo-400 uppercase tracking-[0.2em] opacity-80">
+                            {greeting}
+                        </span>
+                        <div className="w-1 h-1 rounded-full bg-white/20" />
+                        <span className="text-[9px] font-black text-white/60 uppercase tracking-widest">
+                            {playerName}
+                        </span>
+                    </div>
                     <h1 className="text-3xl font-black text-white tracking-tighter flex items-center gap-3">
                         Geometry Dojo
                         <span className={`text-[10px] uppercase font-black px-2 py-0.5 leading-none rounded-md border border-white/5 ${activeDifficulty === 'easy' ? 'bg-green-500/10 text-green-400' :
@@ -107,32 +116,21 @@ export const LevelGrid: React.FC<LevelGridProps> = ({
                     <DynamicSubtitle />
                 </div>
 
-                <div className="flex items-center gap-4">
-                    <div className="flex flex-col items-end">
-                        <span className="text-[10px] font-black text-indigo-400 uppercase tracking-[0.2em] opacity-70">
-                            {greeting}
-                        </span>
-                        <span className="text-sm font-bold text-white tracking-tight">
-                            {playerName}
-                        </span>
-                    </div>
-
-                    <div className="flex gap-2">
-                        <button
-                            onClick={onViewLeaderboard}
-                            className={`p-2.5 rounded-xl transition-all border ${theme === 'space' ? 'bg-white/5 border-white/5 hover:bg-white/10 hover:border-white/20' : 'bg-zinc-900 border-zinc-800 hover:border-zinc-700'} shadow-lg`}
-                            title="Leaderboard"
-                        >
-                            <Trophy className="w-4 h-4 text-yellow-500" />
-                        </button>
-                        <button
-                            onClick={onOpenSettings}
-                            className={`p-2.5 rounded-xl transition-all border ${theme === 'space' ? 'bg-white/5 border-white/5 hover:bg-white/10 hover:border-white/20' : 'bg-zinc-900 border-zinc-800 hover:border-zinc-700'} shadow-lg`}
-                            title="Settings"
-                        >
-                            <Settings className={`w-4 h-4 ${theme === 'space' ? 'text-indigo-200' : 'text-zinc-400'}`} />
-                        </button>
-                    </div>
+                <div className="flex items-center gap-2">
+                    <button
+                        onClick={onViewLeaderboard}
+                        className={`p-2.5 rounded-xl transition-all border ${theme === 'space' ? 'bg-white/5 border-white/5 hover:bg-white/10 hover:border-white/20' : 'bg-zinc-900 border-zinc-800 hover:border-zinc-700'} shadow-lg`}
+                        title="Leaderboard"
+                    >
+                        <Trophy className="w-4 h-4 text-yellow-500" />
+                    </button>
+                    <button
+                        onClick={onOpenSettings}
+                        className={`p-2.5 rounded-xl transition-all border ${theme === 'space' ? 'bg-white/5 border-white/5 hover:bg-white/10 hover:border-white/20' : 'bg-zinc-900 border-zinc-800 hover:border-zinc-700'} shadow-lg`}
+                        title="Settings"
+                    >
+                        <Settings className={`w-4 h-4 ${theme === 'space' ? 'text-indigo-200' : 'text-zinc-400'}`} />
+                    </button>
                 </div>
             </div>
 

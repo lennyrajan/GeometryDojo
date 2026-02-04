@@ -80,7 +80,20 @@ const levels: Level[] = [
             return points;
         })(), unlockScore: 92.0
     },
-    { id: 13, name: "The Moon", description: "Night's eye.", fact: "A crescent moon is called 'waxing' or 'waning'.", shape: createEllipse(0.35, 0.35).slice(0, 30).concat([{ x: 0.5, y: 0.5 }]), unlockScore: 92.0 },
+    {
+        id: 13, name: "The Moon", description: "Night's eye.", fact: "A crescent moon is called 'waxing' or 'waning'.", shape: (() => {
+            const points: Point[] = [];
+            for (let i = 0; i <= 30; i++) {
+                const ang = -Math.PI / 2 + (i * Math.PI / 30);
+                points.push({ x: 0.5 + 0.35 * Math.cos(ang), y: 0.5 + 0.35 * Math.sin(ang) });
+            }
+            for (let i = 0; i <= 30; i++) {
+                const ang = Math.PI / 2 - (i * Math.PI / 30);
+                points.push({ x: 0.35 + 0.35 * Math.cos(ang), y: 0.5 + 0.35 * Math.sin(ang) });
+            }
+            return points;
+        })(), unlockScore: 92.0
+    },
     {
         id: 14, name: "The Pacman", description: "Waka waka.", fact: "A sector of a circle, usually 300°.", shape: (() => {
             const points: Point[] = [];
@@ -236,7 +249,7 @@ const levels: Level[] = [
     { id: 74, name: "The Grandmaster", description: "The ultimate challenge.", fact: "Complex epitrochoid curve with high frequency.", shape: createParametric((t) => Math.cos(t) + 0.5 * Math.cos(7 * t) + 0.33 * Math.sin(17 * t), (t) => Math.sin(t) + 0.5 * Math.sin(7 * t) + 0.33 * Math.cos(17 * t), 0.15, { x: 0.5, y: 0.5 }, 0, 2 * Math.PI, 300), unlockScore: 92.0 },
     { id: 75, name: "The Butterfly", description: "Flutters of precision.", fact: "The butterfly curve is a transcendental plane curve.", shape: createParametric((t) => Math.sin(t) * (Math.exp(Math.cos(t)) - 2 * Math.cos(4 * t) - Math.pow(Math.sin(t / 12), 5)), (t) => Math.cos(t) * (Math.exp(Math.cos(t)) - 2 * Math.cos(4 * t) - Math.pow(Math.sin(t / 12), 5)), 0.1, { x: 0.5, y: 0.5 }, 0, 4 * Math.PI, 200), unlockScore: 92.0 },
     { id: 76, name: "The Bicycle", description: "Pedal to perfection.", fact: "Bicycles are the most efficient human-powered vehicles.", shape: [{ x: 0.3, y: 0.7 }, { x: 0.4, y: 0.7 }, { x: 0.5, y: 0.5 }, { x: 0.7, y: 0.5 }, { x: 0.8, y: 0.7 }, { x: 0.7, y: 0.7 }, { x: 0.6, y: 0.5 }, { x: 0.6, y: 0.4 }, { x: 0.7, y: 0.4 }, { x: 0.6, y: 0.4 }, { x: 0.6, y: 0.5 }, { x: 0.5, y: 0.5 }, { x: 0.4, y: 0.5 }, { x: 0.3, y: 0.7 }], unlockScore: 92.0 },
-    { id: 77, name: "The Phoenix", description: "Rising from ashes.", fact: "Phoenix is a mythical bird that regenerates from its own ashes.", shape: createParametric((t) => (Math.sin(t) * (Math.exp(Math.cos(t)) - 2 * Math.cos(4 * t) - Math.pow(Math.sin(t / 12), 5))) * 1.2, (t) => (Math.cos(t) * (Math.exp(Math.cos(t)) - 2 * Math.cos(4 * t) - Math.pow(Math.sin(t / 12), 5))) * 1.2, 0.1, { x: 0.5, y: 0.45 }, 0, 4 * Math.PI, 300), unlockScore: 92.0 },
+    { id: 77, name: "The Phoenix", description: "Rising from ashes.", fact: "Phoenix is a mythical bird that regenerates from its own ashes.", shape: createParametric((t) => Math.sin(t) * (Math.exp(Math.cos(t)) - 2 * Math.cos(4 * t) - Math.pow(Math.sin(t / 12), 5)), (t) => -Math.abs(Math.cos(t)) * (Math.exp(Math.cos(t)) - 2 * Math.cos(4 * t) - Math.pow(Math.sin(t / 12), 5)) - 1.5, 0.08, { x: 0.5, y: 0.8 }, 0, 4 * Math.PI, 300), unlockScore: 92.0 },
     { id: 78, name: "The Hand", description: "Manual mastery.", fact: "There are 27 bones in the human hand.", shape: [{ x: 0.5, y: 0.9 }, { x: 0.3, y: 0.85 }, { x: 0.2, y: 0.7 }, { x: 0.2, y: 0.4 }, { x: 0.25, y: 0.3 }, { x: 0.3, y: 0.4 }, { x: 0.35, y: 0.2 }, { x: 0.4, y: 0.4 }, { x: 0.45, y: 0.15 }, { x: 0.5, y: 0.4 }, { x: 0.55, y: 0.2 }, { x: 0.6, y: 0.4 }, { x: 0.7, y: 0.6 }, { x: 0.7, y: 0.85 }, { x: 0.5, y: 0.9 }], unlockScore: 92.0 },
     { id: 79, name: "The Eiffel Tower", description: "Parisian landmark.", fact: "The tower was originally intended to be temporary.", shape: [{ x: 0.5, y: 0.1 }, { x: 0.55, y: 0.4 }, { x: 0.45, y: 0.4 }, { x: 0.5, y: 0.1 }, { x: 0.65, y: 0.7 }, { x: 0.35, y: 0.7 }, { x: 0.5, y: 0.1 }, { x: 0.8, y: 0.9 }, { x: 0.7, y: 0.9 }, { x: 0.5, y: 0.7 }, { x: 0.3, y: 0.9 }, { x: 0.2, y: 0.9 }, { x: 0.5, y: 0.1 }], unlockScore: 92.0 },
     { id: 80, name: "The Zen Master", description: "Ultimate harmony.", fact: "A complex epitrochoid representing the flow of life.", shape: createParametric((t) => Math.cos(t) + 0.5 * Math.cos(13 * t) + 0.33 * Math.sin(23 * t), (t) => Math.sin(t) + 0.5 * Math.sin(13 * t) + 0.33 * Math.cos(23 * t), 0.12, { x: 0.5, y: 0.5 }, 0, 2 * Math.PI, 400), unlockScore: 92.0 }

@@ -15,7 +15,7 @@ import { useGlobalLeaderboard } from './hooks/useGlobalLeaderboard';
 const Leaderboard = lazy(() => import('./components/Leaderboard').then(module => ({ default: module.Leaderboard })));
 const SettingsMenu = lazy(() => import('./components/SettingsMenu').then(module => ({ default: module.SettingsMenu })));
 
-const CURRENT_VERSION = '3.1.0';
+const CURRENT_VERSION = '3.1.1';
 const VERSION_CHECK_INTERVAL = 30 * 60 * 1000; // 30 minutes
 
 function App() {
@@ -208,9 +208,9 @@ function App() {
                         >
                             <ArrowLeft className="w-5 h-5" />
                         </button>
-                        <div className="hidden md:flex items-center gap-2 px-3 py-1.5 bg-black/40 backdrop-blur rounded-full border border-white/5">
-                            <div className="w-2 h-2 rounded-full bg-indigo-500 animate-pulse" />
-                            <span className="text-xs font-bold text-indigo-200 uppercase tracking-wider">
+                        <div className="flex items-center gap-2 px-3 py-1.5 bg-black/40 backdrop-blur rounded-full border border-white/5 max-w-[120px] sm:max-w-none overflow-hidden">
+                            <div className="w-2 h-2 rounded-full bg-indigo-500 animate-pulse flex-shrink-0" />
+                            <span className="text-[10px] sm:text-xs font-bold text-indigo-200 uppercase tracking-wider truncate">
                                 {(() => {
                                     const hour = new Date().getHours();
                                     if (hour < 12) return 'Good Morning';
